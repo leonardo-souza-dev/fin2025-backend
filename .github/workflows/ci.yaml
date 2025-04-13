@@ -18,6 +18,7 @@ jobs:
         with:
           node-version: 23.0.0
           architecture: 'x64'
+          node-version-file: 'package.json'
           cache: 'npm'
-      - run: cd .\apps\backend && npm install && npm run test
+      - run: npm install && npm run test
 
