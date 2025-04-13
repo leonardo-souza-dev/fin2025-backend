@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 23.0.0
           architecture: 'x64'
-          node-version-file: 'package.json'
+          cache-dependency-path: ./package-lock.json
           cache: 'npm'
       - run: npm install && npm run test
 
