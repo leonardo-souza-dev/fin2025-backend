@@ -7,9 +7,9 @@ jest.mock('../../src/services/simple-transaction-service')
 jest.mock('../../src/infra/transfer-repository')
 
 describe('TransactionService - getAll', () => {
-    let transactionService: TransactionService;
-    let simpleTransactionServiceMock: jest.Mocked<SimpleTransactionService>;
-    let transferRepositoryMock: jest.Mocked<TransferRepository>;
+    let transactionService: TransactionService
+    let simpleTransactionServiceMock: jest.Mocked<SimpleTransactionService>
+    let transferRepositoryMock: jest.Mocked<TransferRepository>
 
     beforeEach(() => {
         transactionService = new TransactionService();
