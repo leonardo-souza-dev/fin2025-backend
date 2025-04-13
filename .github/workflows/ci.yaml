@@ -2,14 +2,12 @@ name: ci-fin205-back-workflow
 on:
   push:
     branches:
-      - develop
-      - main
       - feature/*
   pull_request:
     branches:
       - develop
 jobs:
-  check-application:
+  check-fin-application:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
