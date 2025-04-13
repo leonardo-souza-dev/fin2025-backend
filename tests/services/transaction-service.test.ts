@@ -1,9 +1,10 @@
 import TransactionService from '../../src/services/transaction-service'
-import SimpleTransactionService from '../../src/services/simple-transaction-service'
-import TransferRepository from '../../src/infra/transfer-repository'
 import Transaction from '../../src/models/transaction'
 
+import SimpleTransactionService from '../../src/services/simple-transaction-service'
 jest.mock('../../src/services/simple-transaction-service')
+
+import TransferRepository from '../../src/infra/transfer-repository'
 jest.mock('../../src/infra/transfer-repository')
 
 describe('TransactionService - getAll', () => {
@@ -13,18 +14,19 @@ describe('TransactionService - getAll', () => {
 
     beforeEach(() => {
         simpleTransactionServiceMock = new SimpleTransactionService() as jest.Mocked<SimpleTransactionService>;
-        transferRepositoryMock = new TransferRepository() as jest.Mocked<TransferRepository>;
-        transactionService = new TransactionService();
-
         (transactionService as any).simpleTransactionService = simpleTransactionServiceMock;
+        
+        transferRepositoryMock = new TransferRepository() as jest.Mocked<TransferRepository>
         (transactionService as any).transferRepository = transferRepositoryMock;
+
+        transactionService = new TransactionService();
     });
 
     it('should return transactions from simple transactions and transfers', async () => {
         // Arrange
         simpleTransactionServiceMock.getAllActive.mockResolvedValue([
             { date: '2023-01-01', description: 'Simple 1', accountId: 1, amount: 100, isActive: true, isRecurrent: false, id: 1 },
-            { date: '2023-01-02', description: 'Simple 2', accountId: 2, amount: 200, isActive: true, isRecurrent: false,id: 2 },
+            { date: '2023-01-02', description: 'Simple 2', accountId: 2, amount: 200, isActive: true, isRecurrent: false, id: 2 },
         ]);
 
         transferRepositoryMock.getAll.mockResolvedValue([
