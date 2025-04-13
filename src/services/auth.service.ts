@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs'
 import jwt, { Secret, SignOptions } from 'jsonwebtoken'
 import { StringValue } from 'ms'
 import dotenv from 'dotenv'
-import User from './../../models/user'
+import User from '../models/user'
 
 dotenv.config()
 

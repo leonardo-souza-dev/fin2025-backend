@@ -1,12 +1,8 @@
-import SimpleTransactionRepository from '../../infra/simple-transaction-repository'
-import TransferRepository from '../../infra/transfer-repository'
-import RecurrenceRepository from '../../infra/recurrence-repository'
-
-import SimpleTransaction from '../../models/simple-transaction'
-import Recurrence from '../../models/recurrence'
-
-import Transaction from '../../models/transaction'
-import Transfer from '../../models/transfer'
+import TransferRepository from '../infra/transfer-repository'
+import RecurrenceRepository from '../infra/recurrence-repository'
+import SimpleTransaction from '../models/simple-transaction'
+import Transaction from '../models/transaction'
+import Transfer from '../models/transfer'
 import SimpleTransactionService from './simple-transaction-service'
 
 export default class TransactionService {

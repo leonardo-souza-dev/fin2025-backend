@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import Sqlitedb from '../infra/sqlitedb'
-import { hashPassword, verifyPassword, generateAccessToken, generateRefreshToken } from '../../src/controllers/services/auth.service'
+import { hashPassword, verifyPassword, generateAccessToken, generateRefreshToken } from '../services/auth.service'
 import User from '../models/user'
 import UserRepository from '../infra/user-repository'
 import jwt from 'jsonwebtoken'

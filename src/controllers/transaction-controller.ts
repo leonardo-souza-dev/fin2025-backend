@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express'
-import TransactionService from '../controllers/services/transaction-service'
+import TransactionService from '../services/transaction-service'
 import { authenticateToken } from '../middleware/auth.middleware'
 
 export default class TransactionController {
