@@ -11,7 +11,7 @@ export default class TransactionService {
     private transferRepository: TransferRepository = new TransferRepository()
     private recurrenceRepository: RecurrenceRepository = new RecurrenceRepository()
 
-    async getAll(): Promise<Transaction[]> {
+    async getAllActive(): Promise<Transaction[]> {
         
         const simpleTransactionsActive = await this.simpleTransactionService.getAllActive()
         const transfers = await this.transferRepository.getAll()
@@ -20,6 +20,7 @@ export default class TransactionService {
         let transactions: Transaction[] = []
 
         simpleTransactionsActive.forEach(simpleTransaction => {
+            if (simpleTransaction.isActive) {
                 transactions.push(new Transaction(
                     simpleTransaction.date,
                     simpleTransaction.description,
@@ -31,6 +32,7 @@ export default class TransactionService {
                     false,
                     simpleTransaction.id
                 ))
+            }
         })
 
         transfers.forEach(transfer => {

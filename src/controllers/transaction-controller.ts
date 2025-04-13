@@ -4,13 +4,11 @@ import { authenticateToken } from '../middleware/auth.middleware'
 
 export default class TransactionController {
 
-    private router: Router
-    private transactionService: TransactionService
+    private router = Router()
+    private transactionService = new TransactionService()
 
     constructor() {
-        this.router = Router()
         this.initializeRoutes()
-        this.transactionService = new TransactionService()
     }
 
     private initializeRoutes() {
@@ -22,7 +20,7 @@ export default class TransactionController {
 
     private async getAll(request: Request, response: Response) {
         try {
-            const entities = await this.transactionService.getAll()
+            const entities = await this.transactionService.getAllActive()
             response.json(entities)        
         } catch (err: any) {
             response.status(500).json({ error: err.message })
