@@ -1,5 +1,5 @@
 import TransferRepository from '../infra/transfer-repository'
-import RecurrenceRepository from '../infra/recurrence-repository'
+import RecurrenceService from '../services/recurrence-service'
 import SimpleTransaction from '../models/simple-transaction'
 import Transaction from '../models/transaction'
 import Transfer from '../models/transfer'
@@ -7,34 +7,43 @@ import SimpleTransactionService from './simple-transaction-service'
 
 export default class TransactionService {
 
-    private simpleTransactionService: SimpleTransactionService = new SimpleTransactionService()
-    private transferRepository: TransferRepository = new TransferRepository()
-    private recurrenceRepository: RecurrenceRepository = new RecurrenceRepository()
+    private simpleTransactionService: SimpleTransactionService
+    private transferRepository: TransferRepository
+    private recurrenceService: RecurrenceService
 
-    async getAllActive(): Promise<Transaction[]> {
-        
-        const simpleTransactionsActive = await this.simpleTransactionService.getAllActive()
-        const transfers = await this.transferRepository.getAll()
-        //const recurrences = await this.recurrenceRepository.getAllActive()
+    constructor(
+        simpleTransactionService: SimpleTransactionService, 
+        transferRepository: TransferRepository, 
+        recurrenceService: RecurrenceService
+    ) {
+        this.simpleTransactionService = simpleTransactionService
+        this.transferRepository = transferRepository
+        this.recurrenceService = recurrenceService
+    }
+
+    async getAllActive(monthSlashYear: string): Promise<Transaction[]> {
 
         let transactions: Transaction[] = []
 
-        simpleTransactionsActive.forEach(simpleTransaction => {
-            if (simpleTransaction.isActive) {
-                transactions.push(new Transaction(
-                    simpleTransaction.date,
-                    simpleTransaction.description,
-                    simpleTransaction.accountId,
-                    simpleTransaction.amount,
-                    'SIMPLE',
-                    null,
-                    true,
-                    false,
-                    simpleTransaction.id
-                ))
-            }
+        const simpleTransactionsActive = await this.simpleTransactionService.getAllActive()
+        
+        simpleTransactionsActive.forEach(simpleTransactionActive => {
+            transactions.push(new Transaction(
+                simpleTransactionActive.date,
+                simpleTransactionActive.description,
+                simpleTransactionActive.accountId,
+                simpleTransactionActive.amount,
+                'SIMPLE',
+                null,
+                true,
+                false,
+                simpleTransactionActive.id
+            ))
         })
 
+
+
+        const transfers = await this.transferRepository.getAll()
         transfers.forEach(transfer => {
             if (transfer.isActive) {
                 transactions.push(new Transaction(
@@ -62,39 +71,34 @@ export default class TransactionService {
             }
         })
 
-        /*
-        recurrences.forEach(recurrence => {
-            const startYear = recurrence.startYearMonth.split('-')[0]
-            const startMonth = recurrence.startYearMonth.split('-')[1]
 
-            const endYear = recurrence.endYearMonth.split('-')[0]
-            const endMonth = recurrence.endYearMonth.split('-')[1]
 
-            const deltaMonths = ((parseInt(endYear) - parseInt(startYear)) * 12 + parseInt(endMonth) - parseInt(startMonth)) + 1
+        const monthSlashYearSplit = monthSlashYear.split("/")
 
-            for (let i = 0; i < deltaMonths; i++) {
-                let year = parseInt(startYear)
-                let month = parseInt(startMonth) + i
-                if (month > 12) {
-                    year++
-                    month -= 12
-                }
+        const year = monthSlashYearSplit[1]
+        const month = monthSlashYearSplit[0].padStart(2, '0')
 
-                const date = `${year}-${month.toString().padStart(2,"0")}-${recurrence.day}`
+        const monthYear = `${year}-${month}`
 
-                transactions.push(new Transaction(
-                    date,
-                    recurrence.name,
-                    recurrence.accountId,
-                    recurrence.amount,
+        const recurrences = await this.recurrenceService.getAllActive(monthYear)
+        const activeRecurrencesMonthYear = recurrences.filter(
+            r => r.isActive &&
+            r.startYearMonth <= monthYear &&
+            r.endYearMonth >= monthYear
+        ).map(r => 
+                new Transaction(
+                    `${year}-${month}-${r.day}`,
+                    r.name,
+                    r.accountId,
+                    r.amount,
                     'RECURRENCE',
                     null,
                     true,
-                    true
-                ))
-            }
-        })
-        */
+                    true,
+                    null
+                )            
+        )
+        transactions = transactions.concat(activeRecurrencesMonthYear)
 
         return transactions        
     }

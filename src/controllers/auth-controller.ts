@@ -28,6 +28,7 @@ export default class AuthController {
         })
     }
 
+    // already migrated to dotnet core
     private async register(req: Request, res: Response) {
         try {
             const { email, password } = req.body
@@ -38,8 +39,7 @@ export default class AuthController {
                 return
             }
 
-            const hashedPassword = await hashPassword(password)
-            
+            const hashedPassword = await hashPassword(password)            
             const newUser: User = new User(email, hashedPassword, true, null)
 
             try {
@@ -55,6 +55,7 @@ export default class AuthController {
         }
     }
 
+    // already migrated to dotnet core
     private async login(req: Request, res: Response) {
         try {
             const { email, password } = req.body
@@ -95,6 +96,7 @@ export default class AuthController {
         }
     }
 
+    // already migrated to dotnet core
     private async refreshToken(req: Request, res: Response) {
         try {
             const refreshToken = req.cookies.refreshToken
