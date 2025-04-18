@@ -26,7 +26,8 @@ export default class TransactionService {
 
         let transactions: Transaction[] = []
 
-        const simpleTransactionsActive = await this.simpleTransactionService.getAllActive()        
+        const simpleTransactionsActive = await this.simpleTransactionService.getAllActive()
+        console.log(`==>>>>>>>>>>>>>>>>>> SERVICE: ${JSON.stringify(simpleTransactionsActive)}`)
         simpleTransactionsActive.forEach(simpleTransactionActive => {
             transactions.push(new Transaction(
                 simpleTransactionActive.date,//
@@ -35,7 +36,7 @@ export default class TransactionService {
                 simpleTransactionActive.amount,//
                 'SIMPLE',
                 null,
-                true,
+                simpleTransactionActive.isActive,
                 false,
                 simpleTransactionActive.id//
             ))
@@ -81,24 +82,28 @@ export default class TransactionService {
         const monthYear = `${year}-${month}`
 
         const recurrences = await this.recurrenceService.getAllActive(monthYear)
-        const activeRecurrencesMonthYear = recurrences.filter(
-            r => r.isActive &&
-            r.startYearMonth <= monthYear &&
-            r.endYearMonth >= monthYear
-        ).map(r => 
-                new Transaction(
-                    `${year}-${month}-${r.day}`,
-                    r.name,
-                    r.accountId,
-                    r.amount,
-                    'RECURRENCE',
-                    null,
-                    true,
-                    true,
-                    null
-                )            
-        )
-        transactions = transactions.concat(activeRecurrencesMonthYear)
+
+        if (recurrences !== null && recurrences !== undefined) {
+            console.log(`rrecurrences: ${JSON.stringify(recurrences)}`)
+            const activeRecurrencesMonthYear = recurrences.filter(
+                r => r.isActive &&
+                r.startYearMonth <= monthYear &&
+                r.endYearMonth >= monthYear
+            ).map(r => 
+                    new Transaction(
+                        `${year}-${month}-${r.day}`,
+                        r.name,
+                        r.accountId,
+                        r.amount,
+                        'RECURRENCE',
+                        null,
+                        true,
+                        true,
+                        null
+                    )            
+            )
+            transactions = transactions.concat(activeRecurrencesMonthYear)
+        }
 
         return transactions        
     }

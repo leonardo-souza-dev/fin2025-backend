@@ -105,10 +105,9 @@ describe('TransactionService - getAll', () => {
     it('should only include active simple transactions', async () => {
         // Arrange
         const simpleTransactionsActive: SimpleTransaction[] = [
-            new SimpleTransaction('2023-01-01', 'Simple 1', 1, 100, true, false, 1),
-            new SimpleTransaction('2023-01-02', 'Simple 2', 2, 200, false, false, 2)
+            new SimpleTransaction('2023-01-01', 'Simple 1', 1, 10000, true, false, 1)
         ]
-        simpleTransactionServiceMock.getAllActive.mockResolvedValue(simpleTransactionsActive)
+        simpleTransactionServiceMock.getAllActive.mockResolvedValueOnce(simpleTransactionsActive)
 
         transferRepositoryMock.getAll.mockResolvedValue([
             { date: '2023-01-04', description: 'Transfer 2', sourceAccountId: 2, amount: 400, destinationAccountId: 3, isActive: false, isRecurrent: false, id: 4 },
