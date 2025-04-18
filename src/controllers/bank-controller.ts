@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express'
 import Sqlitedb from '../infra/sqlitedb'
 import Bank from '../models/bank'
+import { authenticateToken } from '../middleware/auth.middleware'
 
 export default class BankController {
 
@@ -16,9 +17,11 @@ export default class BankController {
     }
 
     private initializeRoutes() {
-        this.router.get('/', this.getAll.bind(this))
+        // already migrated to dotnet core
+        // postman ok2
+        this.router.get('/', authenticateToken, this.getAll.bind(this))
     }
-
+    
     private async getAll(req: Request, res: Response) {
         try {
             const configs = await this.db.getAll<Bank>(BankController.tableName)
