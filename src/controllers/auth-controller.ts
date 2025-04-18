@@ -4,7 +4,6 @@ import { hashPassword, verifyPassword, generateAccessToken, generateRefreshToken
 import User from '../models/user'
 import UserRepository from '../infra/user-repository'
 import jwt from 'jsonwebtoken'
-import { authenticateToken } from '../middleware/auth.middleware'
 
 export default class AuthController {
     
@@ -19,16 +18,23 @@ export default class AuthController {
     }
 
     private initializeRoutes() {
+        // already migrated to dotnet core
+        // postman ok2
         this.router.post('/register', this.register.bind(this))
+
+        // already migrated to dotnet core
+        // postman ok2
         this.router.post('/login', this.login.bind(this))
+        
+        // already migrated to dotnet core
+        // postman ok2
         this.router.post('/refresh', this.refreshToken.bind(this))
+        
+        // already migrated to dotnet core
+        // postman ok2
         this.router.post('/logout', this.logout.bind(this))
-        this.router.get("/dados-seguros", authenticateToken, (req, res) => {
-            res.json({ message: "This is a protected route!" })
-        })
     }
 
-    // already migrated to dotnet core
     private async register(req: Request, res: Response) {
         try {
             const { email, password } = req.body
@@ -49,13 +55,12 @@ export default class AuthController {
                 return
             }
 
-            res.status(201).json({ message: "User registered" })
+            res.status(201).json({ message: "User registered." })
         } catch (err: any) {
             res.status(500).json({ error: err.message })
         }
     }
 
-    // already migrated to dotnet core
     private async login(req: Request, res: Response) {
         try {
             const { email, password } = req.body
@@ -87,17 +92,8 @@ export default class AuthController {
         }
     }
 
-    private async logout(req: Request, res: Response) {
-        try {
-            res.clearCookie("refreshToken")
-            res.json({ message: "Logout success" })
-        } catch (err: any) {
-            res.status(500).json({ error: err.message })
-        }
-    }
-
-    // already migrated to dotnet core
     private async refreshToken(req: Request, res: Response) {
+
         try {
             const refreshToken = req.cookies.refreshToken
 
@@ -135,6 +131,15 @@ export default class AuthController {
 
             const newAccessToken = generateAccessToken(user)
             res.json({ accessToken: newAccessToken });
+        } catch (err: any) {
+            res.status(500).json({ error: err.message })
+        }
+    }
+
+    private async logout(req: Request, res: Response) {
+        try {
+            res.clearCookie("refreshToken")
+            res.json({ message: "Logout success" })
         } catch (err: any) {
             res.status(500).json({ error: err.message })
         }

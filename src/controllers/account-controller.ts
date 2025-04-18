@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express'
 import Sqlitedb from '../infra/sqlitedb'
 import Account from '../models/account'
+import { authenticateToken } from '../middleware/auth.middleware'
 
 export default class AccountController {
 
@@ -14,7 +15,9 @@ export default class AccountController {
     }
 
     private initializeRoutes() {
-        this.router.get('/', this.getAllAccounts.bind(this))
+        // already migrated to dotnet core
+        // postman ok2
+        this.router.get('/', authenticateToken, this.getAllAccounts.bind(this))
     }
 
     private async getAllAccounts(req: Request, res: Response) {

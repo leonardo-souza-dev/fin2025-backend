@@ -21,23 +21,23 @@ export default class TransactionService {
         this.recurrenceService = recurrenceService
     }
 
+    // already migrated to dotnet core
     async getAllActive(monthSlashYear: string): Promise<Transaction[]> {
 
         let transactions: Transaction[] = []
 
-        const simpleTransactionsActive = await this.simpleTransactionService.getAllActive()
-        
+        const simpleTransactionsActive = await this.simpleTransactionService.getAllActive()        
         simpleTransactionsActive.forEach(simpleTransactionActive => {
             transactions.push(new Transaction(
-                simpleTransactionActive.date,
-                simpleTransactionActive.description,
-                simpleTransactionActive.accountId,
-                simpleTransactionActive.amount,
+                simpleTransactionActive.date,//
+                simpleTransactionActive.description,//
+                simpleTransactionActive.accountId,//
+                simpleTransactionActive.amount,//
                 'SIMPLE',
                 null,
                 true,
                 false,
-                simpleTransactionActive.id
+                simpleTransactionActive.id//
             ))
         })
 
@@ -239,10 +239,10 @@ export default class TransactionService {
             throw new Error('idType is required')
         }
 
-        if (this.getIdType(idType.toString()).type === 'SIMPLE') {
-            await this.simpleTransactionService.delete(this.getIdType(idType.toString()).id)
-        } else if (this.getIdType(idType.toString()).type === 'TRANSFER') {
-            const transfer = await this.transferRepository.getById(this.getIdType(idType.toString()).id)
+        if (this.getIdType(idType).type === 'SIMPLE') {
+            await this.simpleTransactionService.delete(this.getIdType(idType).id)
+        } else if (this.getIdType(idType).type === 'TRANSFER') {
+            const transfer = await this.transferRepository.getById(this.getIdType(idType).id)
             if (transfer) {
                 transfer.isActive = false
                 await this.transferRepository.update(transfer)

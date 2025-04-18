@@ -13,9 +13,16 @@ export default class TransactionController {
     }
 
     private initializeRoutes() {
+        // already migrated to dotnet core
+        // postman ok
         this.router.get('/', authenticateToken, this.getAll.bind(this))
-        this.router.get('/:idType', authenticateToken, this.getById.bind(this))
-        this.router.put('/:id', authenticateToken, this.upsert.bind(this))
+
+        // already migrated to dotnet core
+        // postman ok
+        this.router.put('/', authenticateToken, this.upsert.bind(this))
+
+        // already migrated to dotnet core
+        // postman ok
         this.router.delete('/:idType', authenticateToken, this.delete.bind(this))
     }
 
@@ -23,18 +30,10 @@ export default class TransactionController {
         try {
             const monthYear = request.query.monthYear as string
             const entities = await this.transactionService.getAllActive(monthYear)
-            response.json(entities)        
+            response.header('qtd', entities.length.toString())
+            response.json(entities)
         } catch (err: any) {
             response.status(500).json({ error: err.message })
-        }
-    }
-
-    private async getById(req: Request, res: Response) {
-        try {            
-            const entity = await this.transactionService.getById(req.params.idType)
-            res.json(entity);
-        } catch (err: any) {
-            res.status(500).json({ error: err.message });
         }
     }
 

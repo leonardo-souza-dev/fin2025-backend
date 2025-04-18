@@ -5,6 +5,7 @@ export default class SimpleTransactionService {
 
     private simpleTransactionRepository: SimpleTransactionRepository = new SimpleTransactionRepository()
 
+    // already migrated to dotnet core
     async getAllActive(): Promise<SimpleTransaction[]> {
         const simpleTransactions = await this.simpleTransactionRepository.getAll()        
 
