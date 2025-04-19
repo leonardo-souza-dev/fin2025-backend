@@ -41,11 +41,14 @@ public class ConfigServiceTests
         var result = _configService.Upsert(config);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.That(result.Id, Is.EqualTo(newId));
-        Assert.That(result.Key, Is.EqualTo(config.Key));
-        Assert.That(result.Value, Is.EqualTo(config.Value));
-        Assert.That(result.IsActive, Is.EqualTo(config.IsActive));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Id, Is.EqualTo(newId));
+            Assert.That(result.Key, Is.EqualTo(config.Key));
+            Assert.That(result.Value, Is.EqualTo(config.Value));
+            Assert.That(result.IsActive, Is.EqualTo(config.IsActive));
+        });
 
         _configRepositoryMock.Verify(repo => repo.Upsert(It.Is<Config>(c => c == config)), Times.Once);
     }

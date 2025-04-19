@@ -1,8 +1,6 @@
-using Fin.Api.Data;
 using Fin.Api.Models;
 using Fin.Api.Repository;
 using Fin.Api.Services;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace Fin.Api.Tests;
@@ -29,8 +27,8 @@ public class UserServiceTests
         var email = "john@email.com";
         var users = new List<User>
         {
-            new User { Id = 1, Email = email, IsActive = true, Password = "123456789", Role = "user" },
-            new User { Id = 2, Email = "alice@email.com", IsActive = true, Password = "123456789", Role = "user" }
+            new() { Id = 1, Email = email, IsActive = true, Password = "123456789", Role = "user" },
+            new() { Id = 2, Email = "alice@email.com", IsActive = true, Password = "123456789", Role = "user" }
         }.AsQueryable();
 
         _userRepositoryMock.Setup(x => x.GetUserByEmail(email)).Returns(users.FirstOrDefault(u => u.Email == email));
@@ -48,15 +46,7 @@ public class UserServiceTests
     public void WhenPassingNonExistingEmail_ShouldNotGetUser()
     {
         // Arrange
-
         var nonExistingEmail = "nonexisting@email.com";
-        var users = new List<User>
-        {
-            new User { Id = 1, Email = "john@email.com", IsActive = true, Password = "123456789", Role = "user" },
-            new User { Id = 2, Email = "alice@email.com", IsActive = true, Password = "123456789", Role = "user" }
-        }.AsQueryable();
-
-        //_userRepositoryMock.Setup(x => x.GetUserByEmail(nonExistingEmail)).Returns(users.FirstOrDefault(u => u.Email == nonExistingEmail));
 
         // Act
         var result = _userService.GetUserByEmail(nonExistingEmail);
@@ -72,8 +62,8 @@ public class UserServiceTests
         var id = 1;
         var users = new List<User>
         {
-            new User { Id = id, Email = "john@email.com", IsActive = true, Password = "123456789", Role = "user" },
-            new User { Id = 2, Email = "alice@email.com", IsActive = true, Password = "123456789", Role = "user" }
+            new() { Id = id, Email = "john@email.com", IsActive = true, Password = "123456789", Role = "user" },
+            new() { Id = 2, Email = "alice@email.com", IsActive = true, Password = "123456789", Role = "user" }
         }.AsQueryable();
 
         _userRepositoryMock.Setup(x => x.GetUserById(id)).Returns(users.FirstOrDefault(u => u.Id == id));
@@ -91,17 +81,44 @@ public class UserServiceTests
     public void WhenPassingNonExistingId_ShouldNotGetUser()
     {
         // Arrange
-        var users = new List<User>
-        {
-            new User { Id = 1, Email = "john@email.com", IsActive = true, Password = "123456789", Role = "user" },
-            new User { Id = 2, Email = "alice@email.com", IsActive = true, Password = "123456789", Role = "user" }
-        }.AsQueryable();
-
         // Act
         var result = _userService.GetUserById(999);
 
         // Assert
         Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void WhenPassingInvalidEmail_ShouldNotUpsert()
+    {
+        // Arrange
+        var user = new User
+        {
+            Id = 1,
+            Email = null,
+            IsActive = true,
+            Password = "123456789",
+            Role = "user"
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => _userService.Upsert(user));
+    }
+
+    [Test]
+    public void WhenPassingInvalidPassword_ShouldNotUpsert()
+    {
+        // Arrange
+        var user = new User
+        {
+            Id = 1,
+            Email = "user@email.com",
+            IsActive = true,
+            Role = "user"
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => _userService.Upsert(user));
     }
 }
 

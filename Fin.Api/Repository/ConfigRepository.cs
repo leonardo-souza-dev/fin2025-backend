@@ -3,19 +3,13 @@ using Fin.Api.Models;
 
 namespace Fin.Api.Repository;
 
-public class ConfigRepository : IConfigRepository
+public class ConfigRepository(FinDbContext context) : IConfigRepository
 {
-    private readonly FinDbContext _context;
-    public ConfigRepository(FinDbContext context)
-    {
-        _context = context;
-    }
+    private readonly FinDbContext _context = context;
 
     public List<Config> GetAllActive()
     {
-        return _context.Configs
-            .Where(a => a.IsActive)
-            .ToList();
+        return [.. _context.Configs.Where(a => a.IsActive)];
     }
 
     public Config Upsert(Config config)
