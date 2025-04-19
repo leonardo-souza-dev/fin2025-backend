@@ -42,6 +42,7 @@ export default class SimpleTransactionService {
             )
 
             const idCreate = await this.simpleTransactionRepository.create(simpleTransactionCreating)
+            simpleTransactionCreating.id = idCreate
 
             return simpleTransactionCreating             
         } else {

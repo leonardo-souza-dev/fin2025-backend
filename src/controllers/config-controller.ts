@@ -16,11 +16,11 @@ export default class ConfigController {
     }
 
     private initializeRoutes() {
+        // already migrated to dotnet core
         this.router.get('/', this.getAll.bind(this));
-        this.router.get('/:id', this.getById.bind(this));
-        this.router.post('/', this.create.bind(this));
-        this.router.put('/:id', this.update.bind(this));
-        this.router.delete('/:id', this.delete.bind(this));
+
+        // already migrated to dotnet core
+        this.router.put('/', this.upsert.bind(this));
     }
 
     private async getAll(req: Request, res: Response) {
@@ -31,44 +31,34 @@ export default class ConfigController {
             res.status(500).json({ error: err.message });
         }
     }
-
-    private async getById(req: Request, res: Response) {
-        try {
-            const id: number = parseInt(req.params.id, 10);
-            const config = await this.db.getById<Config>(ConfigController.tableName, id);
-            res.json(config);
-        } catch (err: any) {
-            res.status(500).json({ error: err.message });
-        }
-    }
-
-    private async create(req: Request, res: Response) {
-        try {
-            const body = req.body
-            const config = new Config(body.key, body.value, body.isActive, null)
-            const id = await this.db.create<Config>(ConfigController.tableName, config)
-            res.json(id)
-        } catch (err: any) {
-            res.status(500).json({ error: err.message });
-        }
-    }
-
-    private async update(req: Request, res: Response) {
+    private async upsert(req: Request, res: Response) {
         try {
             const config = req.body;
-            config.id = parseInt(req.params.id, 10);
+
+            if (config.id === undefined) {
+                config.isActive = true;
+                await this.db.create<Config>(ConfigController.tableName, config);
+                res.status(201).json(config);
+                return;
+            }
+
+            const existingConfigs = await this.db.getAll<Config>(ConfigController.tableName);
+
+            const existingConfig = existingConfigs.find(c => c.id === config.id);
+            if (!existingConfig) {
+                res.status(404).json({ error: `Config not found with id ${config.id}` });
+                return;
+            }
+            if (!existingConfig.isActive) {
+                res.status(400).json({ error: `Config with id ${config.id} is not active` });
+                return;            }
+
+            if (config.key !== existingConfig.key) {
+                res.status(400).json({ error: `Config with id ${config.id} doesn't have key ${config.key}` });
+                return;
+            }
             await this.db.update<Config>(ConfigController.tableName, config);
             res.json(config);
-        } catch (err: any) {
-            res.status(500).json({ error: err.message });
-        }
-    }
-
-    private async delete(req: Request, res: Response) {
-        try {
-            const id = parseInt(req.params.id, 10);
-            await this.db.delete(ConfigController.tableName, id);
-            res.json(id);
         } catch (err: any) {
             res.status(500).json({ error: err.message });
         }
