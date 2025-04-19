@@ -17,11 +17,9 @@ export default class ConfigController {
 
     private initializeRoutes() {
         // already migrated to dotnet core
-        // postman ok
         this.router.get('/', this.getAll.bind(this));
 
         // already migrated to dotnet core
-        // postman ok
         this.router.put('/', this.upsert.bind(this));
     }
 
@@ -38,32 +36,27 @@ export default class ConfigController {
             const config = req.body;
 
             if (config.id === undefined) {
-                console.log('Creating new config...');
+                config.isActive = true;
                 await this.db.create<Config>(ConfigController.tableName, config);
                 res.status(201).json(config);
                 return;
             }
-            console.log('Updating existing config...');
 
             const existingConfigs = await this.db.getAll<Config>(ConfigController.tableName);
+
             const existingConfig = existingConfigs.find(c => c.id === config.id);
             if (!existingConfig) {
-                console.log(`Config with id ${config.id} not found`);
                 res.status(404).json({ error: `Config not found with id ${config.id}` });
                 return;
             }
             if (!existingConfig.isActive) {
-                console.log(`Config with id ${config.id} is not active`);
                 res.status(400).json({ error: `Config with id ${config.id} is not active` });
                 return;            }
 
             if (config.key !== existingConfig.key) {
-                console.log(`Config with id ${config.id} doesn't have key ${config.key}`);
                 res.status(400).json({ error: `Config with id ${config.id} doesn't have key ${config.key}` });
                 return;
             }
-            console.log(`Updating config with id ${config.id}...`);
-            console.log(config)
             await this.db.update<Config>(ConfigController.tableName, config);
             res.json(config);
         } catch (err: any) {

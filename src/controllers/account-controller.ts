@@ -16,7 +16,6 @@ export default class AccountController {
 
     private initializeRoutes() {
         // already migrated to dotnet core
-        // postman ok2
         this.router.get('/', authenticateToken, this.getAllAccounts.bind(this))
     }
 

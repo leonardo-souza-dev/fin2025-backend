@@ -19,20 +19,16 @@ export default class AuthController {
 
     private initializeRoutes() {
         // already migrated to dotnet core
-        // postman ok2
         this.router.post('/register', this.register.bind(this))
 
         // already migrated to dotnet core
-        // postman ok2
         this.router.post('/login', this.login.bind(this))
         
         // already migrated to dotnet core
-        // postman ok2
         this.router.post('/refresh', this.refreshToken.bind(this))
         
         // already migrated to dotnet core
-        // postman ok2
-        this.router.post('/logout', this.logout.bind(this))
+        this.router.delete('/logout', this.logout.bind(this))
     }
 
     private async register(req: Request, res: Response) {
@@ -106,13 +102,13 @@ export default class AuthController {
             try {
                 decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, { ignoreExpiration: true });
             } catch (err: any) {
-                res.status(401).json({ message: "Invalid token" });
+                res.status(401).json({ message: "Invalid token." });
                 return;
             }
 
 
             if (!decoded || !(decoded as any).id) {
-                res.status(401).json({ message: "Invalid token payload" })
+                res.status(401).json({ message: "Invalid token payload." })
                 return;
             }
 

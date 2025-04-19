@@ -21,13 +21,12 @@ export default class TransactionService {
         this.recurrenceService = recurrenceService
     }
 
-    // already migrated to dotnet core
     async getAllActive(monthSlashYear: string): Promise<Transaction[]> {
 
         let transactions: Transaction[] = []
 
         const simpleTransactionsActive = await this.simpleTransactionService.getAllActive()
-        console.log(`==>>>>>>>>>>>>>>>>>> SERVICE: ${JSON.stringify(simpleTransactionsActive)}`)
+        
         simpleTransactionsActive.forEach(simpleTransactionActive => {
             transactions.push(new Transaction(
                 simpleTransactionActive.date,//
@@ -84,7 +83,6 @@ export default class TransactionService {
         const recurrences = await this.recurrenceService.getAllActive(monthYear)
 
         if (recurrences !== null && recurrences !== undefined) {
-            console.log(`rrecurrences: ${JSON.stringify(recurrences)}`)
             const activeRecurrencesMonthYear = recurrences.filter(
                 r => r.isActive &&
                 r.startYearMonth <= monthYear &&
