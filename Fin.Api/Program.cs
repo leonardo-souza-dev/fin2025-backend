@@ -1,5 +1,6 @@
 using Fin.Api.Data;
 using Fin.Api.Models;
+using Fin.Api.Repository;
 using Fin.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -111,6 +112,8 @@ public class Program
     private static void AddApplicationDependencies(WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<FinDbContext>();
+
+        builder.Services.AddScoped<UserRepository>();
 
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<ConfigService>();

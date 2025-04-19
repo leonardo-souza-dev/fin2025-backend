@@ -1,43 +1,25 @@
-﻿using Fin.Api.Data;
-using Fin.Api.Models;
+﻿using Fin.Api.Models;
+using Fin.Api.Repository;
 
 namespace Fin.Api.Services;
 
-public class UserService(FinDbContext context)
+public class UserService(IUserRepository repository)
 {
-    private readonly FinDbContext _context = context;
+    private readonly IUserRepository _repository = repository;
 
     public User? GetUserByEmail(string email)
     {
-        if (email == null) 
+        if (email == null)
+        {
             throw new ArgumentNullException(nameof(email), "Email cannot be null");
+        }
 
-        var users = _context.Users
-            .Where(u => u.Email == email)
-            .ToList();
-
-        if (users.Count == 0)
-            return null;
-
-        if (users.Count > 1)
-            throw new InvalidOperationException($"Multiple users found with email: {email}");
-
-        return users.First();
+        return _repository.GetUserByEmail(email);
     }
 
     public User? GetUserById(int id)
     {
-        var users = _context.Users
-            .Where(u => u.Id == id)
-            .ToList();
-
-        if (users.Count == 0)
-            return null;
-
-        if (users.Count > 1)
-            throw new InvalidOperationException($"Multiple users found with Id: {id}");
-
-        return users.First();
+        return _repository.GetUserById(id);
     }
 
     public void Upsert(User user)
@@ -54,20 +36,7 @@ public class UserService(FinDbContext context)
         {
             throw new ArgumentException("PasswordHash cannot be null or empty", nameof(user.Password));
         }
-        //TODO: Fazer validacoes no model
 
-        var existingUser = GetUserByEmail(user.Email);
-        if (existingUser != null)
-        {
-            existingUser.Password = user.Password;
-            existingUser.Role = user.Role;
-            existingUser.IsActive = user.IsActive;
-            _context.Users.Update(existingUser);
-        }
-        else
-        {
-            _context.Users.Add(user);
-        }
-        _context.SaveChanges();
+        _repository.Upsert(user);
     }
 }
