@@ -9,16 +9,15 @@ public class User
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Email é obrigatório.")]
+    [Required(ErrorMessage = "Email is required.")]
     [MaxLength(50)]
     public string Email { get; set; }
 
-    [Required(ErrorMessage = "Email é obrigatório.")]
+    [Required(ErrorMessage = "Email is required.")]
     [MaxLength(50)]
     public string Password { get; set; }
 
-    //public string? RefreshToken { get; set; }
     public string Role { get; set; }
-    //public DateTime? RefreshTokenExpiry { get; set; }
+    
     public bool IsActive { get; set; }
 }

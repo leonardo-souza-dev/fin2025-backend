@@ -1,43 +1,26 @@
 ﻿using Fin.Api.Data;
 using Fin.Api.Models;
+using Fin.Api.Repository;
 
 namespace Fin.Api.Services;
 
-public class ConfigService(FinDbContext context)
+public class ConfigService(IConfigRepository repository)
 {
-    private readonly FinDbContext _context = context;
+    private readonly IConfigRepository _repository = repository;
     
     public List<Config> GetAllActive()
     {
-        return _context.Configs
-            .Where(a => a.IsActive)
-            .ToList();
+        return _repository.GetAllActive();
     }
 
-    public void Upsert(Config config, out bool isCreate)
+    public Config Upsert(Config config)
     {
         if (config == null)
         {
             throw new ArgumentNullException(nameof(config), "Config cannot be null");
         }
 
-        var existingConfig = _context.Configs
-            .FirstOrDefault(c => c.Id == config.Id);
-
-        if (existingConfig != null)
-        {
-            existingConfig.Key = config.Key;
-            existingConfig.Value = config.Value;
-            existingConfig.IsActive = config.IsActive;
-            _context.Configs.Update(existingConfig);
-            isCreate = false;
-        }
-        else
-        {
-            _context.Configs.Add(config);
-            isCreate = true;
-        }
-
-        _context.SaveChanges();
+        var configUpserted = _repository.Upsert(config);
+        return configUpserted;
     }
 }
