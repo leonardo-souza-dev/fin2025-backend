@@ -7,7 +7,7 @@ using Moq;
 
 namespace Fin.Api.Tests;
 
-public class UserServiceTest
+public class UserServiceTests
 {
     private Mock<IUserRepository> _userRepositoryMock;
 
