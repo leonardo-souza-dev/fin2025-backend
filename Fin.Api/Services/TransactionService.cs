@@ -14,7 +14,7 @@ public class TransactionService(
 
     public List<Transaction> GetAllActive(string monthSlashYear)
     {
-        List<Transaction> transactions = new List<Transaction>();
+        List<Transaction> transactions = [];
 
         var simpleTransactionsActive = _simpleTransactionService.GetAllActive();
         simpleTransactionsActive.ForEach(simpleTransactionActive =>
@@ -105,7 +105,7 @@ public class TransactionService(
         {
             var simpleTransactionUpserted = _simpleTransactionService.Upsert(new SimpleTransaction
             {
-                Id = isCreate ? 0 : transactionRequest.Id.Value,
+                Id = transactionRequest.Id,
                 Date = transactionRequest.Date,
                 Description = transactionRequest.Description,
                 AccountId = transactionRequest.RefAccountId,
@@ -157,8 +157,8 @@ public class TransactionService(
             };
         } else if (!isCreate && type == "TRANSFER")
         {
-            var transferUpdating = _context.Transfers
-                .FirstOrDefault(t => t.Id == transactionRequest.Id);
+            var transferUpdating = _context.Transfers.FirstOrDefault(t => t.Id == transactionRequest.Id);
+
             if (transferUpdating != null)
             {
                 transferUpdating.Date = transactionRequest.Date;
@@ -196,7 +196,7 @@ public class TransactionService(
             throw new ArgumentNullException(nameof(idType), "IdType cannot be null or empty");
         }
 
-        var idTypeObj = GetIdType(idType);
+        var idTypeObj = TransactionService.GetIdType(idType);
         var idTypeObjType = (string)idTypeObj.Type;
         var idTypeObjId = (int)idTypeObj.Id;
 
@@ -225,9 +225,9 @@ public class TransactionService(
         }
     }
 
-    private dynamic GetIdType(string idType)
+    private static dynamic GetIdType(string idType)
     {
-        int id = 0;
+        int id;
         var type = "";
 
         if (idType.IndexOf("_") > 0)

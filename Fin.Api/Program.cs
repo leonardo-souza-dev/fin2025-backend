@@ -48,7 +48,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Test01", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = Assembly.GetExecutingAssembly().GetName().Name, Version = "v0" });
 
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
             {
@@ -71,7 +71,7 @@ public class Program
                                 Id = "Bearer"
                             }
                         },
-                        new string[] {}
+                        Array.Empty<string>()
                 }
             });
         });
@@ -113,7 +113,8 @@ public class Program
     {
         builder.Services.AddDbContext<FinDbContext>();
 
-        builder.Services.AddScoped<UserRepository>();
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
 
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<ConfigService>();

@@ -113,6 +113,7 @@ public class UserServiceTests
         {
             Id = 1,
             Email = "user@email.com",
+            Password = null,
             IsActive = true,
             Role = "user"
         };
