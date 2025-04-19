@@ -3,9 +3,9 @@ namespace Fin.Api.Models;
 public class Recurrence
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string StartYearMonth { get; set; }
-    public string EndYearMonth { get; set; }
+    public required string Name { get; set; }
+    public required string StartYearMonth { get; set; }
+    public required string EndYearMonth { get; set; }
     public short Day { get; set; }
     public int AccountId { get; set; }
     public decimal Amount { get; set; }
@@ -13,7 +13,7 @@ public class Recurrence
 
     public int GetStartYear()
     {
-        return int.Parse(StartYearMonth.Substring(0, 4));
+        return int.Parse(StartYearMonth[..4]);
     }
 
     public int GetStartMonth()
@@ -23,7 +23,7 @@ public class Recurrence
 
     public int GetEndYear()
     {
-        return int.Parse(EndYearMonth.Substring(0, 4));
+        return int.Parse(EndYearMonth[..4]);
     }
 
     public int GetEndMonth()

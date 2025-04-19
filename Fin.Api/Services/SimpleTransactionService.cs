@@ -19,7 +19,7 @@ public class SimpleTransactionService(FinDbContext context)
     {
         SimpleTransaction simpleTransactionCreating;
 
-        var isCreate = transaction.Id == 0;
+        var isCreate = transaction.Id == 0 || transaction.Id == null;
 
         if (isCreate)
         {

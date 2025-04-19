@@ -23,13 +23,21 @@ public class ConfigsController(ConfigService service) : ControllerBase
         {
             return BadRequest("Config cannot be null");
         }
-        var configUpserted = _service.Upsert(config);
 
-        if (config.Id.HasValue)
+        bool isCreate = false;
+        if (config.Id == null)
         {
-            return Ok(configUpserted);
+            isCreate = true;
         }
 
-        return Created("/api/configs", configUpserted);        
+        _service.Upsert(config);
+
+        if (isCreate)
+        {
+            return Created("/api/configs", config);
+        }
+
+        return Ok(config);
+
     }
 }

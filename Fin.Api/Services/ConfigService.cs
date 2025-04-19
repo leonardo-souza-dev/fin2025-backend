@@ -13,14 +13,13 @@ public class ConfigService(IConfigRepository repository)
         return _repository.GetAllActive();
     }
 
-    public Config Upsert(Config config)
+    public void Upsert(Config config)
     {
         if (config == null)
         {
             throw new ArgumentNullException(nameof(config), "Config cannot be null");
         }
 
-        var configUpserted = _repository.Upsert(config);
-        return configUpserted;
+        _repository.Upsert(config);
     }
 }

@@ -12,7 +12,7 @@ public class ConfigRepository(FinDbContext context) : IConfigRepository
         return [.. _context.Configs.Where(a => a.IsActive)];
     }
 
-    public Config Upsert(Config config)
+    public void Upsert(Config config)
     {
         var existingConfig = _context.Configs
             .FirstOrDefault(c => c.Id == config.Id);
@@ -29,13 +29,11 @@ public class ConfigRepository(FinDbContext context) : IConfigRepository
             _context.Configs.Add(config);
         }
         _context.SaveChanges();
-
-        return config;
     }
 }
 
 public interface IConfigRepository
 {
     List<Config> GetAllActive();
-    Config Upsert(Config config);
+    void Upsert(Config config);
 }

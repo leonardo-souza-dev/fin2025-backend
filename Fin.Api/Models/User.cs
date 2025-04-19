@@ -11,13 +11,13 @@ public class User
 
     [Required(ErrorMessage = "Email is required.")]
     [MaxLength(50)]
-    public string Email { get; set; }
+    public required string Email { get; set; }
 
     [Required(ErrorMessage = "Email is required.")]
     [MaxLength(50)]
-    public string Password { get; set; }
+    public required string Password { get; set; }
 
-    public string Role { get; set; }
+    public string? Role { get; set; }
     
     public bool IsActive { get; set; }
 }
