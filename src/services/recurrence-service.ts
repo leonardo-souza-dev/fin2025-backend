@@ -5,7 +5,6 @@ export default class RecurrenceService {
 
     private recurrenceRepository: RecurrenceRepository = new RecurrenceRepository()
 
-    // already migrated to dotnet core
     async getAllActive(yearDashMonth: string): Promise<Recurrence[]> {
 
         const recurrences = await this.recurrenceRepository.getAllActive()

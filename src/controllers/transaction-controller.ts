@@ -14,15 +14,12 @@ export default class TransactionController {
 
     private initializeRoutes() {
         // already migrated to dotnet core
-        // postman ok
         this.router.get('/', authenticateToken, this.getAll.bind(this))
 
         // already migrated to dotnet core
-        // postman ok
         this.router.put('/', authenticateToken, this.upsert.bind(this))
 
         // already migrated to dotnet core
-        // postman ok
         this.router.delete('/:idType', authenticateToken, this.delete.bind(this))
     }
 
@@ -38,6 +35,7 @@ export default class TransactionController {
     }
 
     private async upsert(request: Request, res: Response) : Promise<void> {
+        
         try {
             const entity = await this.transactionService.upsert(request.body)
             res.json(entity)

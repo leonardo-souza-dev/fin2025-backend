@@ -18,7 +18,6 @@ export default class BankController {
 
     private initializeRoutes() {
         // already migrated to dotnet core
-        // postman ok2
         this.router.get('/', authenticateToken, this.getAll.bind(this))
     }
     
