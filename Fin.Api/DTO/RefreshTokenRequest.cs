@@ -4,11 +4,7 @@ namespace Fin.Api.DTO;
 
 public class RefreshTokenRequest
 {
-    [Required(ErrorMessage = "AccessToken é obrigatório.")]
+    [Required(ErrorMessage = "AccessToken is required.")]
 
     public string AccessToken { get; set; } = string.Empty;
-
-    //[Required(ErrorMessage = "RefreshToken é obrigatório.")]
-
-    public string? RefreshToken { get; set; } = string.Empty;
 }
