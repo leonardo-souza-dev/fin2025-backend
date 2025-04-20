@@ -6,10 +6,12 @@ namespace Fin.Api.Services;
 public class TransactionService(
     SimpleTransactionService simpleTransactionService,
     RecurrenceService recurrenceService,
+    TransferService transferService,
     FinDbContext context)
 {
     private readonly SimpleTransactionService _simpleTransactionService = simpleTransactionService;
     private readonly RecurrenceService _recurrenceService = recurrenceService;
+    private readonly TransferService _transferService = transferService;
     private readonly FinDbContext _context = context;
 
     public List<Transaction> GetAllActive(string monthSlashYear)
@@ -98,93 +100,17 @@ public class TransactionService(
             throw new ArgumentNullException(nameof(transactionRequest), "Transaction cannot be null");
         }
 
-        var isCreate = !transactionRequest.Id.HasValue;
         var type = transactionRequest.OtherAccountId == null ? "SIMPLE" : "TRANSFER";
 
         if (type == "SIMPLE")
         {
-            var simpleTransactionUpserted = _simpleTransactionService.Upsert(new SimpleTransaction
-            {
-                Id = transactionRequest.Id,
-                Date = transactionRequest.Date,
-                Description = transactionRequest.Description,
-                AccountId = transactionRequest.RefAccountId,
-                Amount = transactionRequest.Amount,
-                IsRecurrent = transactionRequest.IsRecurrent,
-                IsActive = transactionRequest.IsActive
-            });
-
-            return new Transaction
-            {
-                Id = simpleTransactionUpserted.Id,
-                Date = transactionRequest.Date,
-                Description = transactionRequest.Description,
-                RefAccountId = transactionRequest.RefAccountId,
-                Amount = transactionRequest.Amount,
-                Type = "SIMPLE",
-                OtherAccountId = transactionRequest.OtherAccountId,
-                IsRecurrent = transactionRequest.IsRecurrent,
-                IsActive = transactionRequest.IsActive
-            };
+            return _simpleTransactionService.Upsert(transactionRequest);
         }
 
-        if (isCreate && type == "TRANSFER")
+        if (type == "TRANSFER")
         {
-            var transferCreating = new Transfer
-            {
-                Date = transactionRequest.Date,
-                Description = transactionRequest.Description,
-                SourceAccountId = transactionRequest.RefAccountId,
-                Amount = transactionRequest.Amount,
-                IsRecurrent = transactionRequest.IsRecurrent,
-                DestinationAccountId = transactionRequest.OtherAccountId.Value,
-                IsActive = transactionRequest.IsActive
-            };
-            _context.Transfers.Add(transferCreating);
-            _context.SaveChanges();
-
-            return new Transaction
-            {
-                Id = transferCreating.Id,
-                Date = transactionRequest.Date,
-                Description = transactionRequest.Description,
-                RefAccountId = transactionRequest.RefAccountId,
-                Amount = transactionRequest.Amount,
-                Type = "TRANSFER",
-                OtherAccountId = transactionRequest.OtherAccountId,
-                IsRecurrent = transactionRequest.IsRecurrent,
-                IsActive = transactionRequest.IsActive,
-            };
-        } else if (!isCreate && type == "TRANSFER")
-        {
-            var transferUpdating = _context.Transfers.FirstOrDefault(t => t.Id == transactionRequest.Id);
-
-            if (transferUpdating != null)
-            {
-                transferUpdating.Date = transactionRequest.Date;
-                transferUpdating.Description = transactionRequest.Description;
-                transferUpdating.SourceAccountId = transactionRequest.RefAccountId;
-                transferUpdating.Amount = transactionRequest.Amount;
-                transferUpdating.IsRecurrent = transactionRequest.IsRecurrent;
-                transferUpdating.DestinationAccountId = transactionRequest.OtherAccountId.Value;
-                transferUpdating.IsActive = transactionRequest.IsActive;
-                _context.Transfers.Update(transferUpdating);
-
-                _context.SaveChanges();
-            }
-            return new Transaction
-            {
-                Id = transferUpdating.Id,
-                Date = transactionRequest.Date,
-                Description = transactionRequest.Description,
-                RefAccountId = transactionRequest.RefAccountId,
-                Amount = transactionRequest.Amount,
-                Type = "TRANSFER",
-                OtherAccountId = transactionRequest.OtherAccountId,
-                IsRecurrent = transactionRequest.IsRecurrent,
-                IsActive = transactionRequest.IsActive
-            };
-        }
+            return _transferService.Upsert(transactionRequest);
+        } 
 
         throw new Exception("Error on upsert transaction.");
     }

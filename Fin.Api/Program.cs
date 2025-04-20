@@ -114,12 +114,14 @@ public class Program
         builder.Services.AddDbContext<FinDbContext>();
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<ISimpleTransactionRepository, SimpleTransactionRepository>();
         builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
 
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<ConfigService>();
         builder.Services.AddScoped<RecurrenceService>();
         builder.Services.AddScoped<SimpleTransactionService>();
+        builder.Services.AddScoped<TransferService>();
         builder.Services.AddScoped<TransactionService>();
         builder.Services.AddScoped<UserService>();
     }
