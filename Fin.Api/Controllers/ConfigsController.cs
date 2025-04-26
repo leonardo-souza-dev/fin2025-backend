@@ -31,7 +31,7 @@ public class ConfigsController(ConfigService service) : ControllerBase
             return BadRequest(ex);
         }
 
-        return Ok(config);
+        return CreatedAtAction(nameof(Create), config);
     }
 
     [HttpPut]
@@ -55,7 +55,6 @@ public class ConfigsController(ConfigService service) : ControllerBase
         {
             return BadRequest("Entity does not exists. " + ex);
         }
-
 
         return Ok(config);
     }

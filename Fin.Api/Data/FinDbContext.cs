@@ -19,9 +19,9 @@ public class FinDbContext : DbContext
         modelBuilder.Entity<User>().ToTable("users");
         modelBuilder.Entity<Bank>().ToTable("banks");
         modelBuilder.Entity<Config>().ToTable("configs");
-        modelBuilder.Entity<Transaction>().ToTable("transactions2");
-        modelBuilder.Entity<Recurrence>().ToTable("recurrences2");
-        modelBuilder.Entity<Transfer>().ToTable("transfers2");
+        modelBuilder.Entity<Transaction>().ToTable("transactions");
+        modelBuilder.Entity<Recurrence>().ToTable("recurrences");
+        modelBuilder.Entity<Transfer>().ToTable("transfers");
 
         modelBuilder.Entity<Transfer>()
             .HasKey(t => new { t.FromTransactionId, t.ToTransactionId});
