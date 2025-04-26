@@ -9,42 +9,114 @@ namespace Fin.Api.Controllers;
 [Route("api/[controller]")]
 public class TransactionsController(TransactionService service) : ControllerBase
 {
-    private readonly TransactionService _service = service;
+    //[HttpGet]
+    //[Authorize]
+    //public IActionResult GetAll(string monthYear)
+    //{
+    //    throw new NotImplementedException();
+    //    //Ok(service.GetAll(monthYear));
+    //}
 
-    [HttpGet]
+    [HttpPost("simple")]
     [Authorize]
-    public IActionResult GetAll(string monthYear) => Ok(_service.GetAllActive(monthYear));
-
-    [HttpPut]
-    [Authorize]
-    public IActionResult Upsert([FromBody] Transaction request)
+    public IActionResult CreateSimple([FromBody] Transaction request)
     {
         if (request == null)
         {
             return BadRequest("Transaction cannot be null");
         }
-        var transaction = _service.Upsert(request);
+        if (request.Id != null)
+        {
+            return BadRequest("Transaction ID must be null for creation");
+        }
+        if (request.Type == "TRANSFER")
+        {
+            return BadRequest("ToAccountId must be null for non-transfer transactions");
+        }
+
+        var transaction = service.Create(request);
+
+        return CreatedAtAction(nameof(CreateSimple), new { id = transaction.Id }, transaction);
+    }
+
+    [HttpPut("simple")]
+    [Authorize]
+    public IActionResult UpdateSimple([FromBody] Transaction request)
+    {
+        if (request == null)
+        {
+            return BadRequest("Transaction cannot be null");
+        }
+        var transaction = service.Update(request);
         return Ok(transaction);
     }
 
-    [HttpDelete("{idType}")]
+    [HttpPost("transfer")]
     [Authorize]
-    public IActionResult Delete([FromRoute] string idType)
+    public IActionResult CreateTransfer([FromBody] Transaction request)
     {
-        if (idType == null)
+        if (request == null)
         {
-            return BadRequest("IdType cannot be null.");
+            return BadRequest("Transaction cannot be null");
         }
-        if (idType.Split("_").Length != 2)
+        if (request.Id != null)
         {
-            return BadRequest("IdType is in wrong format.");
+            return BadRequest("Transaction ID must be null for creation");
         }
-        if (!int.TryParse(idType.Split("_")[0], out _))
+        if (request.Type != "TRANSFER")
         {
-            return BadRequest("IdType is in wrong format.");
+            return BadRequest("ToAccountId must be provided for transfer transactions");
         }
 
-        _service.Delete(idType);
+        var transactionsTransfer = service.CreateTransfer(request);
+
+        return CreatedAtAction(nameof(CreateTransfer), transactionsTransfer);
+    }
+
+    [HttpPut("transfer")]
+    [Authorize]
+    public IActionResult UpdateTransfer([FromBody] Transaction request)
+    {
+        if (request == null)
+        {
+            return BadRequest("Transaction cannot be null");
+        }
+        if (request.Id == null)
+        {
+            return BadRequest("Transaction ID must be provided for update");
+        }
+        if (request.Type != "TRANSFER")
+        {
+            return BadRequest("ToAccountId must be provided for transfer transactions");
+        }
+
+        var transactionsTransfer = service.UpdateTransfer(request);
+
+        return Ok(transactionsTransfer);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize]
+    public IActionResult Delete([FromRoute] int id)
+    {
+        service.Delete(id);
+
         return NoContent();
     }
+
+    //[HttpGet("final-balanceDELETE/{year}/{month}/accounts/{accountIds}")]
+    //[Authorize]
+    //public IActionResult GetFinalBalance(int year, int month, string accountIds)
+    //{
+    //    decimal finalBalance;
+    //    try
+    //    {
+    //        finalBalance = service.GetFinalBalance(year, month, accountIds);
+    //    }
+    //    catch(ArgumentOutOfRangeException ex)
+    //    {
+    //        return NotFound(new { message = ex.Message });
+    //    }
+    //    return Ok(new { finalBalance });
+    //}
 }

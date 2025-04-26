@@ -1,4 +1,4 @@
-using Fin.Api.Data;
+using Fin.Api.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,11 +6,9 @@ namespace Fin.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountsController(FinDbContext context) : ControllerBase
+public class AccountsController(IAccountRepository repository) : ControllerBase
 {
-    private readonly FinDbContext _context = context;
-
     [HttpGet]
     [Authorize]
-    public IActionResult GetAll() =>Ok(_context.Accounts.Where(a => a.IsActive));
+    public IActionResult GetAll() => Ok(repository.GetAll());
 }

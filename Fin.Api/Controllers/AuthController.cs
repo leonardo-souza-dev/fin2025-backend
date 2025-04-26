@@ -1,30 +1,25 @@
 ﻿using Fin.Api.DTO;
 using Fin.Api.Models;
 using Fin.Api.Services;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Fin.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(
+    AuthService authService, 
+    UserService userService,
+    IWebHostEnvironment webHostEnvironment
+    ) : ControllerBase
 {
-    private readonly AuthService _authService;
-    private readonly UserService _userService;
-
-    public AuthController(AuthService tokenService, UserService userService)
-    {
-        _authService = tokenService;
-        _userService = userService;
-    }
+    private const string REFRESH_TOKEN_KEY = "refreshToken";
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        var user = _userService.GetUserByEmail(request.Email);
+        var user = userService.GetUserByEmail(request.Email);
         if (user == null)
         {
             return Unauthorized("User not found.");
@@ -38,18 +33,18 @@ public class AuthController : ControllerBase
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, user.Role) // roles
+            new(ClaimTypes.Role, user.Role)
         };
 
-        var accessToken = _authService.GenerateAccessToken(claims);
-        var refreshToken = _authService.GenerateRefreshToken(user.Id);
+        var accessToken = authService.GenerateAccessToken(claims);
+        var refreshToken = authService.GenerateRefreshToken(user.Id);
 
-        Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+        Response.Cookies.Append(REFRESH_TOKEN_KEY, refreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Path = "/api/auth/refresh"
+            Path = "/"
         });
         return Ok(new { accessToken });
     }
@@ -57,35 +52,33 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
     {
-        // Lê o refresh token do cookie
-        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
+        if (!Request.Cookies.TryGetValue(REFRESH_TOKEN_KEY, out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
         {
             return Unauthorized(new { message = "Not authorized" });
         }
 
-
         var accessToken = request.AccessToken;
 
-
-        var principal = _authService.GetPrincipalFromExpiredToken(accessToken);
+        var principal = authService.GetPrincipalFromExpiredToken(accessToken);
         var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        var user = _userService.GetUserById(int.Parse(userId!));
+        var user = userService.GetUserById(int.Parse(userId!));
         if (user == null)
         {
             return BadRequest("User not found");
         }
 
-        var newRefreshToken = _authService.GenerateRefreshToken(user.Id);
-        Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
+        var newRefreshToken = authService.GenerateRefreshToken(user.Id);
+        Response.Cookies.Append(REFRESH_TOKEN_KEY, newRefreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = _authService.GetRefreshTokenExpiry()
+            //Expires = _authService.GetRefreshTokenExpiry()
+            Path = "/"
         });
 
-        var newAccessToken = _authService.GenerateAccessToken(principal.Claims);
+        var newAccessToken = authService.GenerateAccessToken(principal.Claims);
         return Ok(new { AccessToken = newAccessToken });
     }
 
@@ -99,7 +92,7 @@ public class AuthController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            if (_userService.GetUserByEmail(request.Email) != null)
+            if (userService.GetUserByEmail(request.Email) != null)
             {
                 return Conflict("Email already exists.");
             }
@@ -113,18 +106,27 @@ public class AuthController : ControllerBase
                 IsActive = true,
             };
 
-            _userService.Upsert(newUser);
+            userService.Upsert(newUser);
 
             // 5. Gerar tokens (opcional)
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
-                new Claim(ClaimTypes.Email, newUser.Email),
-                new Claim(ClaimTypes.Role, newUser.Role)
+                new(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
+                new(ClaimTypes.Email, newUser.Email),
+                new(ClaimTypes.Role, newUser.Role)
             };
 
-            var accessToken = _authService.GenerateAccessToken(claims);
-            var refreshToken = _authService.GenerateRefreshToken(newUser.Id);
+            var accessToken = authService.GenerateAccessToken(claims);
+            var refreshToken = authService.GenerateRefreshToken(newUser.Id);
+
+            Response.Cookies.Append(REFRESH_TOKEN_KEY, refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                //Expires = _authService.GetRefreshTokenExpiry()
+                Path = "/"
+            });
 
             return Created("/", new { message = "User registered." });
         }
@@ -137,7 +139,7 @@ public class AuthController : ControllerBase
     [HttpDelete("logout")]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete("refreshToken");
+        Response.Cookies.Delete(REFRESH_TOKEN_KEY);
         return Ok(new { Message = "Logout success" });
     }
 }

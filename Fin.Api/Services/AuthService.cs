@@ -20,6 +20,7 @@ public class AuthService(IConfiguration configuration)
             audience: jwtSettings["Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["AccessTokenExpiryInMinutes"])),
+            //expires: DateTime.UtcNow.AddSeconds(10),
             signingCredentials: signinCredentials
         );
 
