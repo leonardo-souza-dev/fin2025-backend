@@ -3,7 +3,7 @@ using Fin.Api.Repository;
 using Fin.Api.Services;
 using Moq;
 
-namespace Fin.Api.Tests;
+namespace Fin.Api.Tests.Services;
 
 public class UserServiceTests
 {

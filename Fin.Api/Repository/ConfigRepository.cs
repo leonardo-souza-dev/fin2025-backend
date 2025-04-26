@@ -5,35 +5,38 @@ namespace Fin.Api.Repository;
 
 public class ConfigRepository(FinDbContext context) : IConfigRepository
 {
-    private readonly FinDbContext _context = context;
-
-    public List<Config> GetAllActive()
+    public IEnumerable<Config> GetAll()
     {
-        return [.. _context.Configs.Where(a => a.IsActive)];
+        return context.Configs.Where(a => a.IsActive);
     }
 
-    public void Upsert(Config config)
+    public void Create(Config config)
     {
-        var existingConfig = _context.Configs
+        config.IsActive = true;
+        context.Configs.Add(config);
+        context.SaveChanges();
+    }
+
+    public void Update(Config config)
+    {
+        var existingConfig = context.Configs
             .FirstOrDefault(c => c.Id == config.Id);
 
-        if (existingConfig != null)
+        if (existingConfig == null)
         {
-            existingConfig.Key = config.Key;
-            existingConfig.Value = config.Value;
-            existingConfig.IsActive = config.IsActive;
-            _context.Configs.Update(existingConfig);
+            throw new InvalidOperationException();
         }
-        else
-        {
-            _context.Configs.Add(config);
-        }
-        _context.SaveChanges();
+        existingConfig.Key = config.Key;
+        existingConfig.Value = config.Value;
+        existingConfig.IsActive = true;
+        context.Configs.Update(existingConfig);
+        context.SaveChanges();
     }
 }
 
 public interface IConfigRepository
 {
-    List<Config> GetAllActive();
-    void Upsert(Config config);
+    IEnumerable<Config> GetAll();
+    void Create(Config config);
+    void Update(Config config);
 }

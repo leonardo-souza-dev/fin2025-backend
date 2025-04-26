@@ -3,16 +3,11 @@ using Fin.Api.Models;
 
 namespace Fin.Api.Repository;
 
-public class UserRepository : IUserRepository
+public class UserRepository(FinDbContext context) : IUserRepository
 {
-    private readonly FinDbContext _context;
-    public UserRepository(FinDbContext context)
-    {
-        _context = context;
-    }
     public User? GetUserByEmail(string email)
     {
-        var users = _context.Users
+        var users = context.Users
             .Where(u => u.Email == email)
             .ToList();
 
@@ -31,7 +26,7 @@ public class UserRepository : IUserRepository
 
     public User? GetUserById(int id)
     {
-        var users = _context.Users
+        var users = context.Users
             .Where(u => u.Id == id)
             .ToList();
 
@@ -57,14 +52,14 @@ public class UserRepository : IUserRepository
             existingUser.Email = user.Email;
             existingUser.IsActive = user.IsActive;
             existingUser.Role = user.Role;
-            _context.Users.Update(existingUser);
+            context.Users.Update(existingUser);
         }
         else
         {
-            _context.Users.Add(user);
+            context.Users.Add(user);
         }
 
-        _context.SaveChanges();
+        context.SaveChanges();
     }
 }
 

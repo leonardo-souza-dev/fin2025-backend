@@ -1,17 +1,21 @@
 ﻿using Fin.Api.DTO;
 using Fin.Api.Models;
 using Fin.Api.Services;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Fin.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(AuthService tokenService, UserService userService) : ControllerBase
+public class AuthController(
+    AuthService authService, 
+    UserService userService,
+    IWebHostEnvironment webHostEnvironment
+    ) : ControllerBase
 {
+    private const string REFRESH_TOKEN_KEY = "refreshToken";
+
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
@@ -29,18 +33,18 @@ public class AuthController(AuthService tokenService, UserService userService) :
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, user.Role) // roles
+            new(ClaimTypes.Role, user.Role)
         };
 
-        var accessToken = tokenService.GenerateAccessToken(claims);
-        var refreshToken = tokenService.GenerateRefreshToken(user.Id);
+        var accessToken = authService.GenerateAccessToken(claims);
+        var refreshToken = authService.GenerateRefreshToken(user.Id);
 
-        Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+        Response.Cookies.Append(REFRESH_TOKEN_KEY, refreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Path = "/api/auth/refresh"
+            Path = "/"
         });
         return Ok(new { accessToken });
     }
@@ -48,10 +52,14 @@ public class AuthController(AuthService tokenService, UserService userService) :
     [HttpPost("refresh")]
     public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
     {
+        if (!Request.Cookies.TryGetValue(REFRESH_TOKEN_KEY, out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return Unauthorized(new { message = "Not authorized" });
+        }
+
         var accessToken = request.AccessToken;
 
-
-        var principal = tokenService.GetPrincipalFromExpiredToken(accessToken);
+        var principal = authService.GetPrincipalFromExpiredToken(accessToken);
         var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         var user = userService.GetUserById(int.Parse(userId!));
@@ -60,16 +68,17 @@ public class AuthController(AuthService tokenService, UserService userService) :
             return BadRequest("User not found");
         }
 
-        var newRefreshToken = tokenService.GenerateRefreshToken(user.Id);
-        Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
+        var newRefreshToken = authService.GenerateRefreshToken(user.Id);
+        Response.Cookies.Append(REFRESH_TOKEN_KEY, newRefreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = tokenService.GetRefreshTokenExpiry()
+            //Expires = _authService.GetRefreshTokenExpiry()
+            Path = "/"
         });
 
-        var newAccessToken = tokenService.GenerateAccessToken(principal.Claims);
+        var newAccessToken = authService.GenerateAccessToken(principal.Claims);
         return Ok(new { AccessToken = newAccessToken });
     }
 
@@ -102,13 +111,22 @@ public class AuthController(AuthService tokenService, UserService userService) :
             // 5. Gerar tokens (opcional)
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
-                new Claim(ClaimTypes.Email, newUser.Email),
-                new Claim(ClaimTypes.Role, newUser.Role)
+                new(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
+                new(ClaimTypes.Email, newUser.Email),
+                new(ClaimTypes.Role, newUser.Role)
             };
 
-            var accessToken = tokenService.GenerateAccessToken(claims);
-            var refreshToken = tokenService.GenerateRefreshToken(newUser.Id);
+            var accessToken = authService.GenerateAccessToken(claims);
+            var refreshToken = authService.GenerateRefreshToken(newUser.Id);
+
+            Response.Cookies.Append(REFRESH_TOKEN_KEY, refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                //Expires = _authService.GetRefreshTokenExpiry()
+                Path = "/"
+            });
 
             return Created("/", new { message = "User registered." });
         }
@@ -121,7 +139,7 @@ public class AuthController(AuthService tokenService, UserService userService) :
     [HttpDelete("logout")]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete("refreshToken");
+        Response.Cookies.Delete(REFRESH_TOKEN_KEY);
         return Ok(new { Message = "Logout success" });
     }
 }

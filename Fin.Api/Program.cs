@@ -13,6 +13,24 @@ namespace Fin.Api;
 
 public class Program
 {
+    private static void AddApplicationDependencies(WebApplicationBuilder builder)
+    {
+        builder.Services.AddDbContext<FinDbContext>();
+
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
+        builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+        builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+        builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+
+        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<ConfigService>();
+        builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<MonthService>();
+
+        builder.Services.AddScoped<TransactionService>();
+    }
+
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -81,7 +99,7 @@ public class Program
                               policy =>
                               {
                                   policy
-                                    .WithOrigins("http://localhost:9008")
+                                    .WithOrigins("https://localhost:9008", "http://localhost:9008", "https://[::1]:9008")
                                     .AllowAnyHeader()
                                     .AllowAnyMethod()
                                     .AllowCredentials();
@@ -96,33 +114,17 @@ public class Program
         AddApplicationDependencies(builder);
 
         var app = builder.Build();
+
+        app.UseCors(myAllowSpecificOrigins);// before useAuthentication, and useAuthorization
         app.UseAuthentication();
+        app.UseAuthorization();
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
         app.UseHttpsRedirection();
-        app.UseAuthorization();
         app.MapControllers();
-        app.UseCors(myAllowSpecificOrigins);
         app.Run();
-    }
-
-    private static void AddApplicationDependencies(WebApplicationBuilder builder)
-    {
-        builder.Services.AddDbContext<FinDbContext>();
-
-        builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<ISimpleTransactionRepository, SimpleTransactionRepository>();
-        builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
-
-        builder.Services.AddScoped<AuthService>();
-        builder.Services.AddScoped<ConfigService>();
-        builder.Services.AddScoped<RecurrenceService>();
-        builder.Services.AddScoped<SimpleTransactionService>();
-        builder.Services.AddScoped<TransferService>();
-        builder.Services.AddScoped<TransactionService>();
-        builder.Services.AddScoped<UserService>();
     }
 }

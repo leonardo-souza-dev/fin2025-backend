@@ -1,172 +1,122 @@
-﻿using Fin.Api.Data;
-using Fin.Api.Models;
+﻿using Fin.Api.Models;
+using Fin.Api.Repository;
 
 namespace Fin.Api.Services;
 
 public class TransactionService(
-    SimpleTransactionService simpleTransactionService,
-    RecurrenceService recurrenceService,
-    TransferService transferService,
-    FinDbContext context)
+    ITransactionRepository repository,
+    ITransferRepository transferRepository)
 {
-    private readonly SimpleTransactionService _simpleTransactionService = simpleTransactionService;
-    private readonly RecurrenceService _recurrenceService = recurrenceService;
-    private readonly TransferService _transferService = transferService;
-    private readonly FinDbContext _context = context;
-
-    public List<Transaction> GetAllActive(string monthSlashYear)
+    public List<Transaction> GetAll(string monthSlashYear)
     {
-        List<Transaction> transactions = [];
-
-        var simpleTransactionsActive = _simpleTransactionService.GetAllActive();
-        simpleTransactionsActive.ForEach(simpleTransactionActive =>
+        if (string.IsNullOrEmpty(monthSlashYear))
         {
-            transactions.Add(new Transaction
-            {
-                Id = simpleTransactionActive.Id,
-                Date = simpleTransactionActive.Date,
-                Description = simpleTransactionActive.Description,
-                RefAccountId = simpleTransactionActive.AccountId,
-                Amount = simpleTransactionActive.Amount,
-                Type = "SIMPLE",
-                IsRecurrent = simpleTransactionActive.IsRecurrent,
-                IsActive = simpleTransactionActive.IsActive
-            });
-        });
-
-        var activeTransfers = _context.Transfers.Where(a => a.IsActive).ToList();
-        activeTransfers.ForEach(transfer =>
+            throw new ArgumentException("Month and year cannot be null or empty", nameof(monthSlashYear));
+        }
+        var monthYearParts = monthSlashYear.Split('/');
+        if (monthYearParts.Length != 2 || !int.TryParse(monthYearParts[0], out var month) || !int.TryParse(monthYearParts[1], out var year))
         {
-            var transactionSource = new Transaction
-            {
-                Id = transfer.Id,
-                Date = transfer.Date,
-                Description = transfer.Description,
-                RefAccountId = transfer.SourceAccountId,
-                Amount = transfer.Amount,
-                Type = "TRANSFER",
-                OtherAccountId = transfer.DestinationAccountId,
-                IsRecurrent = transfer.IsRecurrent,
-                IsActive = transfer.IsActive
-            };
-            transactions.Add(transactionSource);
-
-            var transactionDestination = new Transaction
-            {
-                Id = transfer.Id,
-                Date = transfer.Date,
-                Description = transfer.Description,
-                RefAccountId = transfer.DestinationAccountId,
-                Amount = transfer.Amount * -1,
-                Type = "TRANSFER",
-                OtherAccountId = transfer.SourceAccountId,
-                IsRecurrent = transfer.IsRecurrent,
-                IsActive = transfer.IsActive
-            };
-            transactions.Add(transactionDestination);
-        });
-
-        var monthSlashYearSplit = monthSlashYear.Split("/");
-        var year = int.Parse(monthSlashYearSplit[1]);
-        var month = int.Parse(monthSlashYearSplit[0]);
-
-        var monthDashYear = $"{year}-{month:00}";
-
-        var recurrences = _recurrenceService.GetAllActive(monthDashYear);
-        foreach (var recurrence in recurrences) // Replaced ForEach with foreach loop
-        {
-            var date = new DateOnly(year, month, recurrence.Day);
-            var transaction = new Transaction
-            {
-                Id = recurrence.Id,
-                Date = date,
-                Description = recurrence.Name,
-                RefAccountId = recurrence.AccountId,
-                Amount = recurrence.Amount,
-                Type = "RECURRENCE",
-                IsRecurrent = true,
-                IsActive = recurrence.IsActive
-            };
-            transactions.Add(transaction);
+            throw new ArgumentException("Invalid month/year format. Expected format: MM/YYYY", nameof(monthSlashYear));
         }
 
+        var transactions = repository.GetAll(year, month);
+        
         return transactions;
     }
 
-    public Transaction Upsert(Transaction transactionRequest)
+    public Transaction Create(Transaction transaction)
     {
-        if (transactionRequest == null)
-        {
-            throw new ArgumentNullException(nameof(transactionRequest), "Transaction cannot be null");
-        }
+        repository.Create(transaction);
 
-        var type = transactionRequest.OtherAccountId == null ? "SIMPLE" : "TRANSFER";
-
-        if (type == "SIMPLE")
-        {
-            return _simpleTransactionService.Upsert(transactionRequest);
-        }
-
-        if (type == "TRANSFER")
-        {
-            return _transferService.Upsert(transactionRequest);
-        } 
-
-        throw new Exception("Error on upsert transaction.");
+        return transaction;
     }
 
-    public void Delete(string idType)
+    public dynamic CreateTransfer(Transaction fromTransaction)
     {
-        if (string.IsNullOrEmpty(idType))
-        {
-            throw new ArgumentNullException(nameof(idType), "IdType cannot be null or empty");
-        }
+        repository.Create(fromTransaction);
 
-        var idTypeObj = TransactionService.GetIdType(idType);
-        var idTypeObjType = (string)idTypeObj.Type;
-        var idTypeObjId = (int)idTypeObj.Id;
+        var toTransaction = fromTransaction.CreateRelatedTransfer();
+        repository.Create(toTransaction);
 
-        if (idTypeObjType == "SIMPLE")
-        {
-            _simpleTransactionService.Delete(idTypeObjId);
-        }
-        else if (idTypeObjType == "TRANSFER")
-        {
-            var transfer = _context.Transfers.Where(t => t.Id == idTypeObjId).FirstOrDefault();
+        transferRepository.Create(fromTransaction.Id.Value, toTransaction.Id.Value);
 
-            if (transfer != null)
-            {
-                transfer.IsActive = false;
-                _context.Transfers.Update(transfer);
-                _context.SaveChanges();
-            }
-            else
-            {
-                throw new Exception($"Transfer with type ${idTypeObjType} not found.");
-            }
-        }
-        else
-        {
-            throw new Exception($"Transfer with type ${idTypeObjType} not found.");
-        }
+        return new { fromTransaction, toTransaction };
     }
 
-    private static dynamic GetIdType(string idType)
+    public dynamic UpdateTransfer(Transaction transaction)
     {
-        int id;
-        var type = "";
+        var transfer = transferRepository.GetAll()
+            .FirstOrDefault(t => t.FromTransactionId == transaction.Id || t.ToTransactionId == transaction.Id) 
+            ?? throw new ArgumentException($"Transfer with Transaction ID {transaction.Id} not found", nameof(transaction.Id));
 
-        if (idType.IndexOf("_") > 0)
+        var fromTransaction = repository.GetAll().FirstOrDefault(t => t.Id == transfer.FromTransactionId);
+        var toTransaction = repository.GetAll().FirstOrDefault(t => t.Id == transfer.ToTransactionId);
+
+        if (fromTransaction == null || toTransaction == null)
         {
-            var idTypeSplit = idType.Split("_");
-            id = int.Parse(idTypeSplit[0]);
-            type = idTypeSplit[1];
-        }
-        else
-        {
-            id = int.Parse(idType);
+            throw new ArgumentException($"Transfer transactions not found.");
         }
 
-        return new { Id = id, Type = type };
+        if (fromTransaction.Id == transaction.Id)
+        {
+            fromTransaction.Date = transaction.Date;
+            fromTransaction.Description = transaction.Description;
+            fromTransaction.FromAccountId = transaction.FromAccountId;
+            fromTransaction.Amount = transaction.Amount;
+            fromTransaction.ToAccountId = transaction.ToAccountId;
+            fromTransaction.RecurrenceId = transaction.RecurrenceId;
+            fromTransaction.IsActive = true;
+            repository.Update(fromTransaction);
+
+            toTransaction.Date = transaction.Date;
+            toTransaction.Description = transaction.Description;
+            toTransaction.FromAccountId = transaction.ToAccountId.Value;
+            toTransaction.Amount = transaction.Amount * -1;
+            toTransaction.ToAccountId = transaction.FromAccountId;
+            toTransaction.RecurrenceId = transaction.RecurrenceId;
+            toTransaction.IsActive = true;
+            repository.Update(toTransaction);
+        }
+        else if (toTransaction.Id == transaction.Id)
+        {
+
+            toTransaction.Date = transaction.Date;
+            toTransaction.Description = transaction.Description;
+            toTransaction.FromAccountId = transaction.FromAccountId;
+            toTransaction.Amount = transaction.Amount;
+            toTransaction.ToAccountId = transaction.ToAccountId.Value;
+            toTransaction.RecurrenceId = transaction.RecurrenceId;
+            toTransaction.IsActive = true;
+            repository.Update(toTransaction);
+
+            fromTransaction.Date = transaction.Date;
+            fromTransaction.Description = transaction.Description;
+            fromTransaction.FromAccountId = transaction.ToAccountId.Value;
+            fromTransaction.Amount = transaction.Amount * -1;
+            fromTransaction.ToAccountId = transaction.FromAccountId;
+            fromTransaction.RecurrenceId = transaction.RecurrenceId;
+            fromTransaction.IsActive = true;
+            repository.Update(fromTransaction);
+        }
+
+        return new { fromTransaction, toTransaction };
+    }
+
+    public Transaction Update(Transaction transaction)
+    {
+        if (transaction == null)
+        {
+            throw new ArgumentNullException(nameof(transaction), "Transaction cannot be null");
+        }
+
+        repository.Update(transaction);
+
+        return transaction;
+    }
+
+    public void Delete(int id)
+    {
+        var transaction = repository.GetAll().FirstOrDefault(t => t.Id == id) ?? throw new ArgumentException($"Transaction with ID {id} not found", nameof(id));
+        repository.Delete(transaction);
     }
 }

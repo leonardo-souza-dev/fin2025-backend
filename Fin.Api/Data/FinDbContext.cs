@@ -5,11 +5,11 @@ namespace Fin.Api.Data;
 
 public class FinDbContext : DbContext
 {
-    public DbSet<Account> Accounts { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Account> Accounts { get; set; }
     public DbSet<Bank> Banks { get; set; }
     public DbSet<Config> Configs { get; set; }
-    public DbSet<SimpleTransaction> SimpleTransactions { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Recurrence> Recurrences { get; set; }
     public DbSet<Transfer> Transfers { get; set; }
 
@@ -19,9 +19,12 @@ public class FinDbContext : DbContext
         modelBuilder.Entity<User>().ToTable("users");
         modelBuilder.Entity<Bank>().ToTable("banks");
         modelBuilder.Entity<Config>().ToTable("configs");
-        modelBuilder.Entity<SimpleTransaction>().ToTable("simpleTransactions");
-        modelBuilder.Entity<Recurrence>().ToTable("recurrences");
-        modelBuilder.Entity<Transfer>().ToTable("transfers");
+        modelBuilder.Entity<Transaction>().ToTable("transactions2");
+        modelBuilder.Entity<Recurrence>().ToTable("recurrences2");
+        modelBuilder.Entity<Transfer>().ToTable("transfers2");
+
+        modelBuilder.Entity<Transfer>()
+            .HasKey(t => new { t.FromTransactionId, t.ToTransactionId});
 
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {

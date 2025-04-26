@@ -9,35 +9,54 @@ namespace Fin.Api.Controllers;
 [Route("api/[controller]")]
 public class ConfigsController(ConfigService service) : ControllerBase
 {
-    private readonly ConfigService _service = service;
-
     [HttpGet]
     [Authorize]
-    public IActionResult GetAll() => Ok(_service.GetAllActive());
+    public IActionResult GetAll() => Ok(service.GetAll());
 
-    [HttpPut]
+    [HttpPost]
     [Authorize]
-    public IActionResult Upsert([FromBody] Config config)
+    public IActionResult Create([FromBody] Config config)
     {
-        if (config == null)
+        if (config == null || config.Id.HasValue)
         {
-            return BadRequest("Config cannot be null");
+            return BadRequest("Config cannot be null or some ID was found.");
         }
 
-        bool isCreate = false;
-        if (config.Id == null)
+        try
         {
-            isCreate = true;
+            service.Create(config);
         }
-
-        _service.Upsert(config);
-
-        if (isCreate)
+        catch(InvalidOperationException ex)
         {
-            return Created("/api/configs", config);
+            return BadRequest(ex);
         }
 
         return Ok(config);
+    }
 
+    [HttpPut]
+    [Authorize]
+    public IActionResult Update([FromBody] Config config)
+    {
+        if (config == null || !config.Id.HasValue)
+        {
+            return BadRequest("Config cannot be null or ID not found.");
+        }
+
+        try
+        {
+            service.Update(config);
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            return NotFound();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest("Entity does not exists. " + ex);
+        }
+
+
+        return Ok(config);
     }
 }
