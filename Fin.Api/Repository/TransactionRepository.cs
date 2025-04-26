@@ -5,14 +5,16 @@ namespace Fin.Api.Repository;
 
 public class TransactionRepository(FinDbContext context) : ITransactionRepository
 {
-    public List<Transaction> GetAll(int? year = null, int? month = null)
+    public IEnumerable<Transaction> GetAll(int? year = null, int? month = null)
     {
+        var activeTransactions = context.Transactions.Where(t => t.IsActive);
+
         if (year != null && month != null)
         {
-            return [.. context.Transactions.Where(t => t.Date.Year == year && t.Date.Month == month && t.IsActive)];
+            return [.. activeTransactions.Where(t => t.Date.Year == year && t.Date.Month == month)];
         }
 
-        return [.. context.Transactions.Where(t => t.IsActive)];
+        return [.. activeTransactions];
     }
 
     public void Create(Transaction transaction)
@@ -25,6 +27,18 @@ public class TransactionRepository(FinDbContext context) : ITransactionRepositor
     {
         transaction.IsActive = false;
         context.Transactions.Update(transaction);
+        context.SaveChanges();
+    }
+
+
+    public void DeleteTransfer(Transaction transaction1, Transaction transaction2)
+    {
+        transaction1.IsActive = false;
+        context.Transactions.Update(transaction1);
+        
+        transaction2.IsActive = false;
+        context.Transactions.Update(transaction2);
+
         context.SaveChanges();
     }
 
@@ -41,8 +55,9 @@ public class TransactionRepository(FinDbContext context) : ITransactionRepositor
 
 public interface ITransactionRepository
 {
-    List<Transaction> GetAll(int? year = null, int? month = null);
+    IEnumerable<Transaction> GetAll(int? year = null, int? month = null);
     void Create(Transaction transaction);
     void Update(Transaction transaction);
     void Delete(Transaction transaction);
+    void DeleteTransfer(Transaction transaction1, Transaction transaction2);
 }

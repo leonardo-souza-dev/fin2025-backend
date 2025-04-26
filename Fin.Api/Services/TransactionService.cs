@@ -7,22 +7,22 @@ public class TransactionService(
     ITransactionRepository repository,
     ITransferRepository transferRepository)
 {
-    public List<Transaction> GetAll(string monthSlashYear)
-    {
-        if (string.IsNullOrEmpty(monthSlashYear))
-        {
-            throw new ArgumentException("Month and year cannot be null or empty", nameof(monthSlashYear));
-        }
-        var monthYearParts = monthSlashYear.Split('/');
-        if (monthYearParts.Length != 2 || !int.TryParse(monthYearParts[0], out var month) || !int.TryParse(monthYearParts[1], out var year))
-        {
-            throw new ArgumentException("Invalid month/year format. Expected format: MM/YYYY", nameof(monthSlashYear));
-        }
+    //public IEnumerable<Transaction> GetAll(string monthSlashYear)
+    //{
+    //    if (string.IsNullOrEmpty(monthSlashYear))
+    //    {
+    //        throw new ArgumentException("Month and year cannot be null or empty", nameof(monthSlashYear));
+    //    }
+    //    var monthYearParts = monthSlashYear.Split('/');
+    //    if (monthYearParts.Length != 2 || !int.TryParse(monthYearParts[0], out var month) || !int.TryParse(monthYearParts[1], out var year))
+    //    {
+    //        throw new ArgumentException("Invalid month/year format. Expected format: MM/YYYY", nameof(monthSlashYear));
+    //    }
 
-        var transactions = repository.GetAll(year, month);
+    //    var transactions = repository.GetAll(year, month);
         
-        return transactions;
-    }
+    //    return transactions;
+    //}
 
     public Transaction Create(Transaction transaction)
     {
@@ -38,7 +38,12 @@ public class TransactionService(
         var toTransaction = fromTransaction.CreateRelatedTransfer();
         repository.Create(toTransaction);
 
-        transferRepository.Create(fromTransaction.Id.Value, toTransaction.Id.Value);
+        transferRepository.Create(new Transfer 
+        { 
+            FromTransactionId = fromTransaction.Id.Value, 
+            ToTransactionId = toTransaction.Id.Value,
+            IsActive = true
+        });
 
         return new { fromTransaction, toTransaction };
     }
@@ -117,6 +122,18 @@ public class TransactionService(
     public void Delete(int id)
     {
         var transaction = repository.GetAll().FirstOrDefault(t => t.Id == id) ?? throw new ArgumentException($"Transaction with ID {id} not found", nameof(id));
-        repository.Delete(transaction);
+        if (transaction.Type == "SIMPLE")
+        {
+            repository.Delete(transaction);
+        }
+        else
+        {
+            var transfer = transferRepository.GetAll()
+                .FirstOrDefault(t => t.FromTransactionId == transaction.Id || t.ToTransactionId == transaction.Id)
+                ?? throw new ArgumentException($"Transfer with Transaction ID {transaction.Id} not found", nameof(transaction.Id));
+
+            transferRepository.Delete(transfer);
+        }
+        
     }
 }

@@ -7,7 +7,7 @@ public class Month
     public decimal FinalBalancePreviousMonth { get; set; }
     public List<DayTransactions> DayTransactions  { get; set; } = [];
 
-    public Month(int year, int month, string selectedAccountIds, List<Account> allAccountsDb, List<Transaction> allTransactionsDb)
+    public Month(int year, int month, string selectedAccountIds, IEnumerable<Account> allAccountsDb, IEnumerable<Transaction> allTransactionsDb)
     {
         var finalBalancePreviousMonth = new FinalBalancePreviousMonth(year, month, selectedAccountIds, allAccountsDb, allTransactionsDb);
         FinalBalancePreviousMonth = finalBalancePreviousMonth.Value;

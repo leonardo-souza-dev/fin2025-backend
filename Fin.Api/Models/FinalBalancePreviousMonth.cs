@@ -5,9 +5,9 @@ namespace Fin.Api.Models;
 public class FinalBalancePreviousMonth(
     int year, 
     int month, 
-    string accountIds, 
-    List<Account> accountDb, 
-    List<Transaction> transactions)
+    string accountIds,
+    IEnumerable<Account> accountDb,
+    IEnumerable<Transaction> transactions)
 {
     public decimal Value
     { 
