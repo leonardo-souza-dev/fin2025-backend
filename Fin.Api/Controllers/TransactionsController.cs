@@ -9,14 +9,6 @@ namespace Fin.Api.Controllers;
 [Route("api/[controller]")]
 public class TransactionsController(TransactionService service) : ControllerBase
 {
-    //[HttpGet]
-    //[Authorize]
-    //public IActionResult GetAll(string monthYear)
-    //{
-    //    throw new NotImplementedException();
-    //    //Ok(service.GetAll(monthYear));
-    //}
-
     [HttpPost("simple")]
     [Authorize]
     public IActionResult CreateSimple([FromBody] Transaction request)
@@ -49,6 +41,15 @@ public class TransactionsController(TransactionService service) : ControllerBase
         }
         var transaction = service.Update(request);
         return Ok(transaction);
+    }
+
+    [HttpDelete("simple/{id}")]
+    [Authorize]
+    public IActionResult DeleteSimple([FromRoute] int id)
+    {
+        service.Delete(id);
+
+        return NoContent();
     }
 
     [HttpPost("transfer")]
@@ -95,28 +96,12 @@ public class TransactionsController(TransactionService service) : ControllerBase
         return Ok(transactionsTransfer);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("transfer/{id}")]
     [Authorize]
-    public IActionResult Delete([FromRoute] int id)
+    public IActionResult DeleteTransfer([FromRoute] int id)
     {
         service.Delete(id);
 
         return NoContent();
     }
-
-    //[HttpGet("final-balanceDELETE/{year}/{month}/accounts/{accountIds}")]
-    //[Authorize]
-    //public IActionResult GetFinalBalance(int year, int month, string accountIds)
-    //{
-    //    decimal finalBalance;
-    //    try
-    //    {
-    //        finalBalance = service.GetFinalBalance(year, month, accountIds);
-    //    }
-    //    catch(ArgumentOutOfRangeException ex)
-    //    {
-    //        return NotFound(new { message = ex.Message });
-    //    }
-    //    return Ok(new { finalBalance });
-    //}
 }
