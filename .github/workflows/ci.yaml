@@ -1,8 +1,5 @@
 name: ci-fin205-back-workflow
 on:
-  push:
-    branches:
-      - feature/*
   pull_request:
     branches:
       - develop
