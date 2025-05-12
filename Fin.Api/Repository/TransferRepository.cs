@@ -15,7 +15,8 @@ public class TransferRepository(FinDbContext context) : ITransferRepository
         var transfer = new Transfer
         {
             FromTransactionId = fromTransactionId,
-            ToTransactionId = toTransactionId
+            ToTransactionId = toTransactionId,
+            IsActive = true
         };
         context.Transfers.Add(transfer);
         context.SaveChanges();
