@@ -10,7 +10,9 @@ public class TransferRepository(FinDbContext context) : ITransferRepository
         return [.. context.Transfers];
     }
 
-    public void Create(int fromTransactionId, int toTransactionId)
+    public void Create(
+        int fromTransactionId,
+        int toTransactionId)
     {
         var transfer = new Transfer
         {
@@ -18,6 +20,7 @@ public class TransferRepository(FinDbContext context) : ITransferRepository
             ToTransactionId = toTransactionId,
             IsActive = true
         };
+
         context.Transfers.Add(transfer);
         context.SaveChanges();
     }
