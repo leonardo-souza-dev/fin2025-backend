@@ -1,8 +1,5 @@
 name: ci-fin205-back-workflow
 on:
-  push:
-    branches:
-      - feature/*
   pull_request:
     branches:
       - develop
@@ -12,11 +9,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set Node 23
-        uses: actions/setup-node@v4
+      - name: Set dotnet 8.0
+        uses: actions/setup-dotnet@v4
         with:
-          node-version: 23.0.0
-          cache-dependency-path: ./package-lock.json
-          architecture: 'x64'
-          cache: 'npm'
-      - run: npm install && npm run test
+          dotnet-version: '8.0'
+      - run: dotnet test
