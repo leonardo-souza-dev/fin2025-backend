@@ -3,33 +3,54 @@ using Fin.Api.Repository;
 
 namespace Fin.Api.Services;
 
-public class TransactionService(
-    ITransactionRepository repository,
-    ITransferRepository transferRepository)
+public class TransactionService(ITransactionRepository repository, ITransferRepository transferRepository)
 {
-    //public IEnumerable<Transaction> GetAll(string monthSlashYear)
-    //{
-    //    if (string.IsNullOrEmpty(monthSlashYear))
-    //    {
-    //        throw new ArgumentException("Month and year cannot be null or empty", nameof(monthSlashYear));
-    //    }
-    //    var monthYearParts = monthSlashYear.Split('/');
-    //    if (monthYearParts.Length != 2 || !int.TryParse(monthYearParts[0], out var month) || !int.TryParse(monthYearParts[1], out var year))
-    //    {
-    //        throw new ArgumentException("Invalid month/year format. Expected format: MM/YYYY", nameof(monthSlashYear));
-    //    }
-
-    //    var transactions = repository.GetAll(year, month);
-        
-    //    return transactions;
-    //}
-
-    public Transaction Create(Transaction transaction)
+    public Transaction CreateSimple(Transaction transaction)
     {
+        if (transaction.IsRecurrent && transaction.RecurrenceStartMonth.HasValue && transaction.RecurrenceEndMonth.HasValue && transaction.RecurrenceDay.HasValue)
+        {
+            var numberOcurrences =
+                (transaction.RecurrenceEndMonth.Value.Year - transaction.RecurrenceStartMonth.Value.Year) * 12 +
+                (transaction.RecurrenceEndMonth.Value.Month - transaction.RecurrenceStartMonth.Value.Month) + 1;
+
+            for (var i = 0; i < numberOcurrences; i++)
+            {
+                var date = transaction.RecurrenceStartMonth.Value.AddMonths(i).AddDays(transaction.RecurrenceDay.Value - 1);
+                var newTransaction = new Transaction
+                {
+                    Date = new DateOnly(date.Year, date.Month, date.Day),
+                    Description = transaction.Description,
+                    FromAccountId = transaction.FromAccountId,
+                    Amount = transaction.Amount,
+                    ToAccountId = transaction.ToAccountId,
+                    RecurrenceId = transaction.RecurrenceId,
+                    IsActive = true
+                };
+                repository.Create(newTransaction);
+            }
+        }
         repository.Create(transaction);
 
         return transaction;
     }
+
+    public Transaction UpdateSimple(Transaction transaction)
+    {
+        if (transaction == null)
+        {
+            throw new ArgumentNullException(nameof(transaction), "Transaction cannot be null");
+        }
+
+        repository.Update(transaction);
+
+        return transaction;
+    }
+
+
+
+
+
+
 
     public dynamic CreateTransfer(Transaction fromTransaction)
     {
@@ -105,18 +126,6 @@ public class TransactionService(
         }
 
         return new { fromTransaction, toTransaction };
-    }
-
-    public Transaction Update(Transaction transaction)
-    {
-        if (transaction == null)
-        {
-            throw new ArgumentNullException(nameof(transaction), "Transaction cannot be null");
-        }
-
-        repository.Update(transaction);
-
-        return transaction;
     }
 
     public void Delete(int id)

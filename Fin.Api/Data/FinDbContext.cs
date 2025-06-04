@@ -10,7 +10,7 @@ public class FinDbContext : DbContext
     public DbSet<Bank> Banks { get; set; }
     public DbSet<Config> Configs { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
-    public DbSet<Recurrence> Recurrences { get; set; }
+    public DbSet<RecurrenceId> RecurrenceIds { get; set; }
     public DbSet<Transfer> Transfers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -20,7 +20,7 @@ public class FinDbContext : DbContext
         modelBuilder.Entity<Bank>().ToTable("banks");
         modelBuilder.Entity<Config>().ToTable("configs");
         modelBuilder.Entity<Transaction>().ToTable("transactions");
-        modelBuilder.Entity<Recurrence>().ToTable("recurrences");
+        modelBuilder.Entity<RecurrenceId>().ToTable("recurrenceIds");
         modelBuilder.Entity<Transfer>().ToTable("transfers");
 
         modelBuilder.Entity<Transfer>()
