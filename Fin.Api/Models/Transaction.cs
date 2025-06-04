@@ -8,7 +8,13 @@ public class Transaction
     public required int FromAccountId { get; set; }
     public required decimal Amount { get; set; }
     public int? ToAccountId { get; set; }
+    
     public int? RecurrenceId { get; set; }
+    
+    public DateOnly? RecurrenceStartMonth { get; set; }
+    public DateOnly? RecurrenceEndMonth { get; set; }
+    public int? RecurrenceDay { get; set; }
+
     public required bool IsActive { get; set; }
 
     public string Type => ToAccountId != null ? "TRANSFER" : "SIMPLE";
