@@ -1,4 +1,5 @@
 using Fin.Api.Data;
+using Fin.Api.Infra;
 using Fin.Api.Models;
 using Fin.Api.Repository;
 using Fin.Api.Services;
@@ -13,9 +14,23 @@ namespace Fin.Api;
 
 public class Program
 {
+    private const string FIN2025_JWT_SECRET_KEY = "FIN2025_JWT_SECRET_KEY";
+    private const string FIN2025_DATABASE_CONNECTION = "FIN2025_DATABASE_CONNECTION";
+
     private static void AddApplicationDependencies(WebApplicationBuilder builder)
     {
-        builder.Services.AddDbContext<FinDbContext>();
+        builder.Services.AddSingleton<ServerPortInfraService>();
+
+        var connectionString = Environment.GetEnvironmentVariable(FIN2025_DATABASE_CONNECTION);
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException(
+                "String de conexão não configurada. Configure a variável de ambiente FIN2025_DATABASE_CONNECTION ou a configuração DefaultConnection.");
+            
+        }
+
+        builder.Services.AddDbContext<FinDbContext>(options => options.UseSqlite(connectionString));
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
@@ -36,7 +51,16 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-        var secretKey = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]!);
+        
+        var secretKey = Environment.GetEnvironmentVariable(FIN2025_JWT_SECRET_KEY);
+
+        if (string.IsNullOrEmpty(secretKey))
+        {
+            throw new InvalidOperationException(
+                "JWT Secret Key não configurada. Configure a variável de ambiente JWT_SECRET_KEY ou use User Secrets.");
+        }
+
+        var secretKeyBytes = Encoding.ASCII.GetBytes(secretKey);
 
         builder.Services.AddAuthentication(options =>
         {
@@ -53,8 +77,8 @@ public class Program
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtSettings["Issuer"],
                 ValidAudience = jwtSettings["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-                ClockSkew = TimeSpan.Zero // Remove toler�ncia de tempo
+                IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+                ClockSkew = TimeSpan.Zero // Remove tolerância de tempo
             };
         });
         builder.Services.AddAuthorization();
@@ -99,7 +123,13 @@ public class Program
                               policy =>
                               {
                                   policy
-                                    .WithOrigins("https://localhost:9008", "http://localhost:9008", "https://[::1]:9008")
+                                    .WithOrigins(
+                                      "http://127.0.0.1:3000", 
+                                      "https://127.0.0.1:3000",
+                                      "http://localhost:3000",
+                                      "https://localhost:3000",
+                                      "http://[::1]:3000",
+                                      "https://[::1]:3000")
                                     .AllowAnyHeader()
                                     .AllowAnyMethod()
                                     .AllowCredentials();
@@ -118,11 +148,11 @@ public class Program
         app.UseCors(myAllowSpecificOrigins);// before useAuthentication, and useAuthorization
         app.UseAuthentication();
         app.UseAuthorization();
-        if (app.Environment.IsDevelopment())
-        {
+        //if (app.Environment.IsDevelopment())
+        //{
             app.UseSwagger();
             app.UseSwaggerUI();
-        }
+        //}
         app.UseHttpsRedirection();
         app.MapControllers();
         app.Run();

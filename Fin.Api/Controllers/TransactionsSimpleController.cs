@@ -1,3 +1,4 @@
+using Fin.Api.DTO;
 using Fin.Api.Models;
 using Fin.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,7 @@ public class TransactionsSimpleController(TransactionService service) : Controll
 {
     [HttpPost]
     [Authorize]
-    public IActionResult Create([FromBody] Transaction request)
+    public IActionResult Create([FromBody] TransactionRequest request)
     {
         if (request == null)
         {
@@ -20,10 +21,6 @@ public class TransactionsSimpleController(TransactionService service) : Controll
         if (request.Id != null)
         {
             return BadRequest("Transaction ID must be null for creation");
-        }
-        if (request.Type == "TRANSFER")
-        {
-            return BadRequest("ToAccountId must be null for non-transfer transactions");
         }
 
         var transaction = service.CreateSimple(request);
