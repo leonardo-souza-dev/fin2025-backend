@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Fin.Api.Services;
@@ -8,11 +9,32 @@ namespace Fin.Api.Services;
 public class AuthService(IConfiguration configuration)
 {
     private readonly IConfiguration _configuration = configuration;
+    private const string FIN2025_JWT_SECRET_KEY = "FIN2025_JWT_SECRET_KEY";
+
+    private string GetSecretKey()
+    {
+        var secretKey = Environment.GetEnvironmentVariable(FIN2025_JWT_SECRET_KEY);
+
+        if (string.IsNullOrEmpty(secretKey))
+        {
+            throw new InvalidOperationException(
+                "JWT Secret Key não configurada. Configure a variável de ambiente JWT_SECRET_KEY ou use User Secrets.");
+        }
+
+        // Validação básica da força da chave
+        if (secretKey.Length < 32)
+        {
+            throw new InvalidOperationException(
+                "JWT Secret Key deve ter pelo menos 32 caracteres para segurança adequada.");
+        }
+
+        return secretKey;
+    }
 
     public string GenerateAccessToken(IEnumerable<Claim> claims)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!));
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GetSecretKey()));
         var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
         var tokenOptions = new JwtSecurityToken(
@@ -20,7 +42,6 @@ public class AuthService(IConfiguration configuration)
             audience: jwtSettings["Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["AccessTokenExpiryInMinutes"])),
-            //expires: DateTime.UtcNow.AddSeconds(10),
             signingCredentials: signinCredentials
         );
 
@@ -30,7 +51,7 @@ public class AuthService(IConfiguration configuration)
     public string GenerateRefreshToken(int userId)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!));
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GetSecretKey()));
         var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
         var tokenOptions = new JwtSecurityToken(
             issuer: jwtSettings["Issuer"],
@@ -53,7 +74,7 @@ public class AuthService(IConfiguration configuration)
             ValidateAudience = false, // Pode ajustar conforme necessário
             ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GetSecretKey())),
             ValidateLifetime = false // Ignora expiração para pegar claims
         };
 

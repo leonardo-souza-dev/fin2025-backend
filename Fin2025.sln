@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\ci.yaml = .github\workflows\ci.yaml
 		query.sql = query.sql
 		README.md = README.md
+		start-backend.bat = start-backend.bat
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fin.Api.Tests", "Fin.Api.Tests\Fin.Api.Tests.csproj", "{F5C678E1-6136-48D0-89A1-737CAF8CDBC6}"
