@@ -11,10 +11,6 @@ public class Transaction
     
     public int? RecurrenceId { get; set; }
     
-    public DateOnly? RecurrenceStartMonth { get; set; }
-    public DateOnly? RecurrenceEndMonth { get; set; }
-    public int? RecurrenceDay { get; set; }
-
     public required bool IsActive { get; set; }
 
     public string Type => ToAccountId != null ? "TRANSFER" : "SIMPLE";

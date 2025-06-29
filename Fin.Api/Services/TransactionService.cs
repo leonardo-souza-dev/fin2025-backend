@@ -1,35 +1,54 @@
-﻿using Fin.Api.Models;
+﻿using Fin.Api.DTO;
+using Fin.Api.Models;
 using Fin.Api.Repository;
 
 namespace Fin.Api.Services;
 
 public class TransactionService(ITransactionRepository repository, ITransferRepository transferRepository)
 {
-    public Transaction CreateSimple(Transaction transaction)
+    public Transaction CreateSimple(TransactionRequest transactionRequest)
     {
-        if (transaction.IsRecurrent && transaction.RecurrenceStartMonth.HasValue && transaction.RecurrenceEndMonth.HasValue && transaction.RecurrenceDay.HasValue)
+        if (transactionRequest.RecurrenceId.HasValue && transactionRequest.RecurrenceEndMonth.HasValue && transactionRequest.RecurrenceEndYear.HasValue)
         {
             var numberOcurrences =
-                (transaction.RecurrenceEndMonth.Value.Year - transaction.RecurrenceStartMonth.Value.Year) * 12 +
-                (transaction.RecurrenceEndMonth.Value.Month - transaction.RecurrenceStartMonth.Value.Month) + 1;
+                (transactionRequest.RecurrenceEndYear.Value - transactionRequest.Date.Year) * 12 +
+                (transactionRequest.RecurrenceEndMonth.Value - transactionRequest.Date.Month) + 1;
 
+            Transaction firstTransaction = null;
             for (var i = 0; i < numberOcurrences; i++)
             {
-                var date = transaction.RecurrenceStartMonth.Value.AddMonths(i).AddDays(transaction.RecurrenceDay.Value - 1);
+                var date = transactionRequest.Date.AddMonths(i).AddDays(transactionRequest.Date.Day - 1);
                 var newTransaction = new Transaction
                 {
                     Date = new DateOnly(date.Year, date.Month, date.Day),
-                    Description = transaction.Description,
-                    FromAccountId = transaction.FromAccountId,
-                    Amount = transaction.Amount,
-                    ToAccountId = transaction.ToAccountId,
-                    RecurrenceId = transaction.RecurrenceId,
+                    Description = transactionRequest.Description,
+                    FromAccountId = transactionRequest.FromAccountId,
+                    Amount = transactionRequest.Amount,
+                    ToAccountId = transactionRequest.ToAccountId,
+                    RecurrenceId = transactionRequest.RecurrenceId,
                     IsActive = true
                 };
                 repository.Create(newTransaction);
+                if (i == 0)
+                {
+                    firstTransaction = newTransaction;
+                }
             }
+
+            return firstTransaction;
         }
-        repository.Create(transaction);
+        
+        var transaction = new Transaction
+        {
+            Date = transactionRequest.Date,
+            Description = transactionRequest.Description,
+            FromAccountId = transactionRequest.FromAccountId,
+            Amount = transactionRequest.Amount,
+            ToAccountId = transactionRequest.ToAccountId,
+            RecurrenceId = transactionRequest.RecurrenceId,
+            IsActive = true
+        };
+        repository.Create(transaction);        
 
         return transaction;
     }
