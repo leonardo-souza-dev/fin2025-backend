@@ -1,6 +1,5 @@
 using Fin.Api.Data;
 using Fin.Api.Infra;
-using Fin.Api.Models;
 using Fin.Api.Repository;
 using Fin.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,11 +25,10 @@ public class Program
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException(
-                "String de conexão não configurada. Configure a variável de ambiente FIN2025_DATABASE_CONNECTION ou a configuração DefaultConnection.");
-            
+                "String de conexão não configurada. Configure a variável de ambiente FIN2025_DATABASE_CONNECTION ou a configuração DefaultConnection.");            
         }
 
-        builder.Services.AddDbContext<FinDbContext>(options => options.UseSqlite(connectionString));
+        builder.Services.AddDbContext<FinDbContext>(options => options.UseNpgsql(connectionString));
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
@@ -148,11 +146,8 @@ public class Program
         app.UseCors(myAllowSpecificOrigins);// before useAuthentication, and useAuthorization
         app.UseAuthentication();
         app.UseAuthorization();
-        //if (app.Environment.IsDevelopment())
-        //{
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        //}
+        app.UseSwagger();
+        app.UseSwaggerUI();
         app.UseHttpsRedirection();
         app.MapControllers();
         app.Run();

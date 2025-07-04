@@ -363,3 +363,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /fin_db.db
+/.idea/.idea.Fin2025/.idea

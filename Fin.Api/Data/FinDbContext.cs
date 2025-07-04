@@ -1,8 +1,5 @@
-using Fin.Api.Infra;
 using Fin.Api.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Diagnostics;
 
 namespace Fin.Api.Data;
 
@@ -16,15 +13,9 @@ public class FinDbContext : DbContext
     public DbSet<Recurrence> Recurrences { get; set; }
     public DbSet<Transfer> Transfers { get; set; }
 
-    private readonly ServerPortInfraService _serverPortInfraService;
-    private readonly IConfiguration _configuration;
-
-    public FinDbContext(
-        ServerPortInfraService serverPortInfraService,
-        IConfiguration configuration)
+    public FinDbContext(DbContextOptions<FinDbContext> options)
+        : base(options)
     {
-        _serverPortInfraService = serverPortInfraService;
-        _configuration = configuration;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -47,27 +38,5 @@ public class FinDbContext : DbContext
                 property.SetColumnName(property.GetColumnName()?.ToLower());
             }
         }
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            var connectionString = GetConnectionString();
-            optionsBuilder.UseSqlite(connectionString);
-        }
-    }
-
-    private string GetConnectionString()
-    {
-        var connectionString = Environment.GetEnvironmentVariable("FIN2025_DATABASE_CONNECTION");
-
-        if (!string.IsNullOrEmpty(connectionString))
-        {
-            return connectionString;
-        }
-        
-        throw new InvalidOperationException(
-            "String de conexão não configurada. Configure a variável de ambiente FIN2025_DATABASE_CONNECTION ou a configuração DefaultConnection.");
     }
 }
