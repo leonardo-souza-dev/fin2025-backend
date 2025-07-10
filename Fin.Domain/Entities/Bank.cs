@@ -1,4 +1,4 @@
-namespace Fin.Api.Models;
+namespace Fin.Domain.Entities;
 
 public record Bank(
     int Id, 

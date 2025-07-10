@@ -1,6 +1,6 @@
 ﻿using Fin.Api.DTO;
-using Fin.Api.Models;
-using Fin.Api.Repository;
+using Fin.Domain.Entities;
+using Fin.Domain.Interfaces;
 
 namespace Fin.Api.Services;
 

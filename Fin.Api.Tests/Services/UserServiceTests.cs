@@ -1,5 +1,5 @@
-using Fin.Api.Models;
-using Fin.Api.Repository;
+using Fin.Domain.Entities;
+using Fin.Domain.Interfaces;
 using Fin.Api.Services;
 using Moq;
 

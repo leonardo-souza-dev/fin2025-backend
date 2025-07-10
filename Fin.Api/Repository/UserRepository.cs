@@ -1,5 +1,6 @@
 ﻿using Fin.Api.Data;
-using Fin.Api.Models;
+using Fin.Domain.Entities;
+using Fin.Domain.Interfaces;
 
 namespace Fin.Api.Repository;
 
@@ -61,11 +62,4 @@ public class UserRepository(FinDbContext context) : IUserRepository
 
         context.SaveChanges();
     }
-}
-
-public interface IUserRepository
-{
-    User? GetUserByEmail(string email);
-    User? GetUserById(int id);
-    void Upsert(User user);
 }

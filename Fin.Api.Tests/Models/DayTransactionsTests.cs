@@ -1,4 +1,4 @@
-﻿using Fin.Api.Models;
+﻿using Fin.Domain.Entities;
 
 namespace Fin.Api.Tests.Models;
 

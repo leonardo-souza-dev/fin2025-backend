@@ -1,6 +1,4 @@
-using Fin.Api.Services;
-
-namespace Fin.Api.Models;
+namespace Fin.Domain.Entities;
 
 public class Month
 {

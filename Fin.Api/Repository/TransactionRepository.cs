@@ -1,5 +1,6 @@
 ﻿using Fin.Api.Data;
-using Fin.Api.Models;
+using Fin.Domain.Interfaces;
+using Fin.Domain.Entities;
 
 namespace Fin.Api.Repository;
 
@@ -51,13 +52,4 @@ public class TransactionRepository(FinDbContext context) : ITransactionRepositor
             context.SaveChanges();
         }
     }
-}
-
-public interface ITransactionRepository
-{
-    IEnumerable<Transaction> GetAll(int? year = null, int? month = null);
-    void Create(Transaction transaction);
-    void Update(Transaction transaction);
-    void Delete(Transaction transaction);
-    void DeleteTransfer(Transaction transaction1, Transaction transaction2);
 }

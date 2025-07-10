@@ -1,4 +1,4 @@
-using Fin.Api.Repository;
+using Fin.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
