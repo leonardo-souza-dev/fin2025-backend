@@ -1,6 +1,6 @@
 ﻿using Fin.Api.DTO;
-using Fin.Api.Models;
 using Fin.Api.Services;
+using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 

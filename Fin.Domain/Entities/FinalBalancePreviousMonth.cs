@@ -1,6 +1,6 @@
-using Fin.Api.Services;
+using Fin.Shared;
 
-namespace Fin.Api.Models;
+namespace Fin.Domain.Entities;
 
 public class FinalBalancePreviousMonth(
     int year, 

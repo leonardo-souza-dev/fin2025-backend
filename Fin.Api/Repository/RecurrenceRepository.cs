@@ -1,5 +1,6 @@
 ﻿using Fin.Api.Data;
-using Fin.Api.Models;
+using Fin.Domain.Entities;
+using Fin.Domain.Interfaces;
 
 namespace Fin.Api.Repository;
 
@@ -11,7 +12,3 @@ public class RecurrenceRepository(FinDbContext context) : IRecurrenceRepository
     }
 }
 
-public interface IRecurrenceRepository
-{
-    IEnumerable<Recurrence> GetAll();
-}

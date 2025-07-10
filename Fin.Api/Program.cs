@@ -2,6 +2,7 @@ using Fin.Api.Data;
 using Fin.Api.Infra;
 using Fin.Api.Repository;
 using Fin.Api.Services;
+using Fin.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

@@ -1,4 +1,4 @@
-﻿namespace Fin.Api.Services;
+﻿namespace Fin.Shared;
 
 public class DateHelper
 {
@@ -7,8 +7,8 @@ public class DateHelper
         var date1 = new DateTime(year1, month1, 1);
         var date2 = new DateTime(year2, month2, 1);
 
-        var obj1IsBeforeObj2 = DateTime.Compare(date2 , date1);
-        
+        var obj1IsBeforeObj2 = DateTime.Compare(date2, date1);
+
         return obj1IsBeforeObj2 > 0;
-    }    
+    }
 }

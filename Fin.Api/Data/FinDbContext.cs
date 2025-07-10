@@ -1,4 +1,4 @@
-using Fin.Api.Models;
+using Fin.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fin.Api.Data;

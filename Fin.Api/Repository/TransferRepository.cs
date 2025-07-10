@@ -1,5 +1,6 @@
 ﻿using Fin.Api.Data;
-using Fin.Api.Models;
+using Fin.Domain.Entities;
+using Fin.Domain.Interfaces;
 
 namespace Fin.Api.Repository;
 
@@ -39,9 +40,4 @@ public class TransferRepository(FinDbContext context) : ITransferRepository
     }
 }
 
-public interface ITransferRepository
-{
-    IEnumerable<Transfer> GetAll();
-    void Create(Transfer transfer);
-    void Delete(Transfer transfer);
-}
+

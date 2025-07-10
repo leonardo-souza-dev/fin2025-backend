@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Fin.Api.Models;
+namespace Fin.Domain.Entities;
 
 public class User
 {

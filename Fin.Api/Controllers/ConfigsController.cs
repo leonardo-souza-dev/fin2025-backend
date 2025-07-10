@@ -1,5 +1,5 @@
-using Fin.Api.Models;
 using Fin.Api.Services;
+using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
