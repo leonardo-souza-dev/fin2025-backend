@@ -13,6 +13,9 @@ public class MonthTests
     //[TestCase(2025, 6, "16", 0)]
     public void ShouldHaveValidValues(int year, int month, string accounts, int dayTransactionsCountExpected)
     {
+        // pre-arrange
+        var accountIds = accounts.Split(',').Select(int.Parse).ToList();
+
         // Arrange
         var date = new DateOnly(2050, 1, 1);
         var transactions = new List<Transaction>
@@ -29,7 +32,7 @@ public class MonthTests
         };
 
         // Act
-        var sut = new Month(year, month, accounts, accountsDb, transactions);
+        var sut = new Month(year, month, accountIds, accountsDb, transactions);
 
         // Assert
         Assert.Multiple(() =>
