@@ -18,7 +18,9 @@ public class MonthService(
             throw new ArgumentOutOfRangeException(nameof(monthNumber), "Month must be between 1 and 12.");
         }
 
-        var month = new Month(yearNumber, monthNumber, selectedAccountIds, accountRepository.GetAll(), transactionRepository.GetAll());
+        var accountIds = selectedAccountIds.Split(',').Select(id => int.Parse(id)).ToList();
+
+        var month = new Month(yearNumber, monthNumber, accountIds, accountRepository.GetAll(), transactionRepository.GetAll());
 
         return month;
     }

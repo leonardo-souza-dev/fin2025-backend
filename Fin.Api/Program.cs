@@ -56,7 +56,7 @@ public class Program
         if (string.IsNullOrEmpty(secretKey))
         {
             throw new InvalidOperationException(
-                "JWT Secret Key não configurada. Configure a variável de ambiente JWT_SECRET_KEY ou use User Secrets.");
+                "JWT Secret Key não configurada. Configure a variável de ambiente FIN2025_JWT_SECRET_KEY ou use User Secrets.");
         }
 
         var secretKeyBytes = Encoding.ASCII.GetBytes(secretKey);

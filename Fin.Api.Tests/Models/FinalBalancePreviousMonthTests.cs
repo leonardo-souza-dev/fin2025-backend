@@ -17,6 +17,9 @@ public class FinalBalancePreviousMonthTests
     [TestCase(2025, 8, "62", 1234)]
     public void ShouldHaveValidValues(int year, int month, string accounts, int finalBalancePreviousMonthExpected)
     {
+        // pre-arrange
+        var accountIds = accounts.Split(',').Select(int.Parse).ToList();
+
         // Arrange
         var date = new DateOnly(2050, 1, 1);
         var transactions = new List<Transaction>
@@ -41,7 +44,7 @@ public class FinalBalancePreviousMonthTests
         };
 
         // Act
-        var sut = new FinalBalancePreviousMonth(year, month, accounts, accountsDb, transactions);
+        var sut = new FinalBalancePreviousMonth(year, month, accountIds, accountsDb, transactions);
 
         // Assert
         Assert.Multiple(() =>
