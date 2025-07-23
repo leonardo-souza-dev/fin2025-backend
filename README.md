@@ -1,3 +1,3 @@
 # FinApi
 
-API usando .NET 6 e Entity Framework Core
+API usando .NET 9 e Entity Framework Core
