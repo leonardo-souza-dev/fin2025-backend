@@ -104,15 +104,15 @@ public class Program
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                        new OpenApiSecurityScheme
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
                         {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
                 }
             });
         });
@@ -139,7 +139,6 @@ public class Program
             options.LowercaseUrls = true;
         });
 
-        // Add services to the container.
         AddApplicationDependencies(builder);
 
         var app = builder.Build();
