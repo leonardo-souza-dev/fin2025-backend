@@ -1,4 +1,6 @@
 using Fin.Api.Services;
+using Fin.Application.Interfaces;
+using Fin.Application.UseCases;
 using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,12 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Fin.Api.Controllers;
 
 [ApiController]
-[Route("api/transactions/transfer")]
-public class TransactionsTransferController(TransactionService service) : ControllerBase
+[Route("api/transfer")]
+public class TransferController(TransactionService service, ICreateTransferHandler createTransferHandler) : ControllerBase
 {
     [HttpPost]
     [Authorize]
-    public IActionResult Create([FromBody] Transaction request)
+    public async Task<IActionResult> Create([FromBody] Transaction request)
     {
         if (request == null)
         {
@@ -26,9 +28,20 @@ public class TransactionsTransferController(TransactionService service) : Contro
             return BadRequest("ToAccountId must be provided for transfer transactions");
         }
 
-        var transactionsTransfer = service.CreateTransfer(request);
+        //var transactionsTransfer = service.CreateTransfer(request);
 
-        return CreatedAtAction(nameof(Create), transactionsTransfer);
+        var createTransferRequest = new CreateTransferRequest
+        {
+            Date = request.Date,
+            Description = request.Description,
+            Amount = request.Amount,
+            FromAccountId = request.FromAccountId,
+            ToAccountId = request.ToAccountId.Value,
+            IsRecurrence = request.IsRecurrent
+        };
+        var transfer = await createTransferHandler.Handle(createTransferRequest);
+
+        return CreatedAtAction(nameof(Create), transfer);
     }
 
     [HttpPut]

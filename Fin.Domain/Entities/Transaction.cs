@@ -2,16 +2,16 @@ namespace Fin.Domain.Entities;
 
 public class Transaction
 {
-    public int? Id { get; set; }
+    public int? Id { get; init; }
     public required DateOnly Date { get; set; }
     public required string Description { get; set; }
     public required int FromAccountId { get; set; }
     public required decimal Amount { get; set; }
     public int? ToAccountId { get; set; }
-    
     public int? RecurrenceId { get; set; }
-    
     public required bool IsActive { get; set; }
+    
+    
 
     public string Type => ToAccountId != null ? "TRANSFER" : "SIMPLE";
     public bool IsRecurrent => RecurrenceId != null;

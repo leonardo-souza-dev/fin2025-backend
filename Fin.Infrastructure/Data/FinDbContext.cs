@@ -1,0 +1,43 @@
+﻿using Fin.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace Fin.Infrastructure.Data;
+
+public class FinDbContext : DbContext
+{
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<Bank> Banks => Set<Bank>();
+    public DbSet<Config> Configs => Set<Config>();
+    public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<Recurrence> Recurrences => Set<Recurrence>();
+    public DbSet<Transfer> Transfers => Set<Transfer>();
+
+    public FinDbContext(DbContextOptions<FinDbContext> options)
+        : base(options)
+    {
+        Database.EnsureCreated();
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Account>().ToTable("accounts");
+        modelBuilder.Entity<User>().ToTable("users");
+        modelBuilder.Entity<Bank>().ToTable("banks");
+        modelBuilder.Entity<Config>().ToTable("configs");
+        modelBuilder.Entity<Transaction>().ToTable("transactions");
+        modelBuilder.Entity<Recurrence>().ToTable("recurrences");
+        modelBuilder.Entity<Transfer>().ToTable("transfers");
+
+        modelBuilder.Entity<Transfer>()
+            .HasKey(t => new { t.FromTransactionId, t.ToTransactionId });
+
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var property in entity.GetProperties())
+            {
+                property.SetColumnName(property.GetColumnName()?.ToLower());
+            }
+        }
+    }
+}

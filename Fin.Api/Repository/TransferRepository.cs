@@ -17,6 +17,14 @@ public class TransferRepository(FinDbContext context) : ITransferRepository
         context.SaveChanges();
     }
 
+    public async Task CreateAsync(Transfer transfer)
+    {
+        ArgumentNullException.ThrowIfNull(transfer, nameof(transfer));
+        transfer.IsActive = true;
+        
+        await context.Transfers.AddAsync(transfer);
+    }
+
     public void Delete(Transfer transfer)
     {
         var fromTransaction = context.Transactions.FirstOrDefault(t => t.Id == transfer.FromTransactionId) ??
