@@ -1,7 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Fin.Domain.Entities;
 
-public record Bank(
-    int Id, 
-    string Name, 
-    bool IsActive
-);
+public class Bank
+{
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; init; }
+    public string Name { get; init; }
+    public bool IsActive { get; init; }
+}

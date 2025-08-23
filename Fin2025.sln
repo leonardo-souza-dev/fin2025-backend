@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		start-backend.bat = start-backend.bat
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fin.Api.Tests", "Fin.Api.Tests\Fin.Api.Tests.csproj", "{F5C678E1-6136-48D0-89A1-737CAF8CDBC6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fin.Application.Tests", "Fin.Application.Tests\Fin.Application.Tests.csproj", "{F5C678E1-6136-48D0-89A1-737CAF8CDBC6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fin.Domain", "Fin.Domain\Fin.Domain.csproj", "{13479E6A-8371-4808-8456-ED7E45F4D023}"
 EndProject
@@ -23,6 +23,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fin.Application", "Fin.Application\Fin.Application.csproj", "{BBA3CA91-F893-450C-9ED3-7E26762BD3E6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fin.Infrastructure", "Fin.Infrastructure\Fin.Infrastructure.csproj", "{A45E0C36-E944-4B57-913F-DBE50AC7BED0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fin.Domain.Tests", "Fin.Domain.Tests\Fin.Domain.Tests.csproj", "{7D069924-154D-4A2B-AD5E-B579B130A567}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fin.Api.IntegrationTests", "Fin.Api.IntegrationTests\Fin.Api.IntegrationTests.csproj", "{211B1DD0-B769-462A-BA45-60E0E3F611C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +58,14 @@ Global
 		{A45E0C36-E944-4B57-913F-DBE50AC7BED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A45E0C36-E944-4B57-913F-DBE50AC7BED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A45E0C36-E944-4B57-913F-DBE50AC7BED0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D069924-154D-4A2B-AD5E-B579B130A567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D069924-154D-4A2B-AD5E-B579B130A567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D069924-154D-4A2B-AD5E-B579B130A567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D069924-154D-4A2B-AD5E-B579B130A567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{211B1DD0-B769-462A-BA45-60E0E3F611C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{211B1DD0-B769-462A-BA45-60E0E3F611C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{211B1DD0-B769-462A-BA45-60E0E3F611C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{211B1DD0-B769-462A-BA45-60E0E3F611C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

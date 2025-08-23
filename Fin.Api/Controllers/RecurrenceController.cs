@@ -1,5 +1,4 @@
-using Fin.Api.Repository;
-using Fin.Api.Services;
+using Fin.Application.UseCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

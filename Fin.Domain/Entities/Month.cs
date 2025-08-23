@@ -5,7 +5,13 @@ public class Month
     public decimal FinalBalancePreviousMonth { get; set; }
     public List<DayTransactions> DayTransactions  { get; set; } = [];
 
-    public Month(int year, int month, List<int> selectedAccountIds, IEnumerable<Account> allAccountsDb, IEnumerable<Transaction> allTransactionsDb)
+    public Month(
+        int year, 
+        int month, 
+        List<int> selectedAccountIds, 
+        IEnumerable<Account> allAccountsDb, 
+        IEnumerable<Transaction> allTransactionsDb,
+        IEnumerable<Transfer> allTransfersDb)
     {
         var finalBalancePreviousMonth = new FinalBalancePreviousMonth(year, month, selectedAccountIds, allAccountsDb, allTransactionsDb);
         FinalBalancePreviousMonth = finalBalancePreviousMonth.Value;
@@ -30,7 +36,7 @@ public class Month
                 .Where(transaction => transaction.Date == date)
                 .ToList();
 
-            var dayTransaction = new DayTransactions(initialBalance, date, transactionsDate);
+            var dayTransaction = new DayTransactions(initialBalance, date, transactionsDate, allTransfersDb);
             DayTransactions.Add(dayTransaction);
             initialBalance = dayTransaction.FinalBalance;
         }

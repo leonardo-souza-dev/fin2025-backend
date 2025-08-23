@@ -1,8 +1,8 @@
 ﻿using Fin.Api.DTO;
-using Fin.Api.Services;
 using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Fin.Application.UseCases;
 
 namespace Fin.Api.Controllers;
 
@@ -10,8 +10,7 @@ namespace Fin.Api.Controllers;
 [Route("api/[controller]")]
 public class AuthController(
     AuthService authService, 
-    UserService userService,
-    IWebHostEnvironment webHostEnvironment
+    UserService userService
     ) : ControllerBase
 {
     private const string REFRESH_TOKEN_KEY = "refreshToken";
@@ -46,7 +45,7 @@ public class AuthController(
             SameSite = SameSiteMode.Strict,
             Path = "/"
         });
-        return Ok(new { accessToken });
+        return Ok(new LoginResponse { AccessToken = accessToken });
     }
 
     [HttpPost("refresh")]

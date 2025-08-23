@@ -1,16 +1,12 @@
-using Fin.Api.Data;
-using Fin.Api.Infra;
-using Fin.Api.Repository;
-using Fin.Api.Services;
-using Fin.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
-using Fin.Application.Interfaces;
 using Fin.Application.UseCases;
+using Fin.Infrastructure.Data;
+using Fin.Infrastructure.Repositories;
 
 namespace Fin.Api;
 
@@ -21,8 +17,6 @@ public class Program
 
     private static void AddApplicationDependencies(WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<ServerPortInfraService>();
-
         var connectionString = Environment.GetEnvironmentVariable(FIN2025_DATABASE_CONNECTION);
 
         if (string.IsNullOrEmpty(connectionString))
@@ -31,27 +25,26 @@ public class Program
                 "String de conexão não configurada. Configure a variável de ambiente FIN2025_DATABASE_CONNECTION ou a configuração DefaultConnection.");            
         }
 
-        builder.Services.AddDbContext<FinDbContext>(options => options.UseNpgsql(connectionString));
-        builder.Services.AddDbContext<Fin.Infrastructure.Data.FinDbContext>(options => options.UseNpgsql(connectionString));
+        builder.Services.AddDbContext<FinDbContext>(options => options.UseNpgsql(connectionString), ServiceLifetime.Scoped);
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IBankRepository, BankRepository>();
         builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
         builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         builder.Services.AddScoped<ITransferRepository, TransferRepository>();
         
-        builder.Services.AddScoped<Fin.Infrastructure.Interfaces.ITransactionRepository, Fin.Infrastructure.Repositories.TransactionRepository>();
-        builder.Services.AddScoped<Fin.Infrastructure.Interfaces.ITransferRepository, Fin.Infrastructure.Repositories.TransferRepository>();
-        
-        builder.Services.AddScoped<Fin.Infrastructure.Data.IUnitOfWork, Fin.Infrastructure.Data.UnitOfWork>();
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        builder.Services.AddScoped<ICreateTransferHandler, CreateTransferHandler>();
+        builder.Services.AddScoped<ICreateTransferUseCase, CreateTransferUseCase>();
+        builder.Services.AddScoped<IGetAccountsUseCase, GetAccountsUseCase>();
+        builder.Services.AddScoped<IGetBanksUseCase, GetBanksUseCase>();
+        builder.Services.AddScoped<IGetMonthUseCase, GetMonthUseCase>();
+        builder.Services.AddScoped<IUpdateTransferUseCase, UpdateTransferUseCase>();
         
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<ConfigService>();
         builder.Services.AddScoped<UserService>();
-        builder.Services.AddScoped<MonthService>();
-
         builder.Services.AddScoped<TransactionService>();
     }
 

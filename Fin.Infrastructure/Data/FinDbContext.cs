@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fin.Infrastructure.Data;
 
-public class FinDbContext : DbContext
+public sealed class FinDbContext : DbContext
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<Account> Accounts => Set<Account>();
@@ -28,9 +28,6 @@ public class FinDbContext : DbContext
         modelBuilder.Entity<Transaction>().ToTable("transactions");
         modelBuilder.Entity<Recurrence>().ToTable("recurrences");
         modelBuilder.Entity<Transfer>().ToTable("transfers");
-
-        modelBuilder.Entity<Transfer>()
-            .HasKey(t => new { t.FromTransactionId, t.ToTransactionId });
 
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {

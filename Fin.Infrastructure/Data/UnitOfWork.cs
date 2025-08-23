@@ -1,16 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Fin.Infrastructure.Data;
-
-public sealed class UnitOfWork(FinDbContext context) : IUnitOfWork
+namespace Fin.Infrastructure.Data
 {
-    public Task<IDbContextTransaction> BeginTransactionAsync()
+    public interface IUnitOfWork
     {
-        return context.Database.BeginTransactionAsync();
+        IDbContextTransaction BeginTransaction();
+        int SaveChanges();
     }
 
-    public Task SaveChangesAsync(CancellationToken cancellationToken = default)
+    public sealed class UnitOfWork(FinDbContext context) : IUnitOfWork
     {
-        return context.SaveChangesAsync(cancellationToken);
+        public IDbContextTransaction BeginTransaction()
+        {
+            return context.Database.BeginTransaction();
+        }
+
+        public int SaveChanges()
+        {
+            return context.SaveChanges();
+        }
     }
 }
