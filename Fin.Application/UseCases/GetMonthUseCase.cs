@@ -4,16 +4,11 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    public interface IGetMonthUseCase
-    {
-        GetMonthResponse Handle(int yearNumber, int monthNumber, string selectedAccountIds);
-    }
-
     public class GetMonthUseCase(
         ITransactionRepository transactionRepository,
         IAccountRepository accountRepository,
         ITransferRepository transferRepository
-        ) : IGetMonthUseCase
+        ) 
     {
         public GetMonthResponse Handle(int yearNumber, int monthNumber, string selectedAccountIds)
         {

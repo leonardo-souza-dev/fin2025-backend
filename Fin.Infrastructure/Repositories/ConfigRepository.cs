@@ -6,6 +6,7 @@ namespace Fin.Infrastructure.Repositories
     public interface IConfigRepository
     {
         IEnumerable<Config> GetAll();
+        Config? Get(int id);
         void Create(Config config);
         void Update(Config config);
     }
@@ -17,17 +18,20 @@ namespace Fin.Infrastructure.Repositories
             return context.Configs.Where(a => a.IsActive);
         }
 
+        public Config? Get(int id)
+        {
+            return context.Configs.Find(id);
+        }
+
         public void Create(Config config)
         {
             config.IsActive = true;
             context.Configs.Add(config);
-            context.SaveChanges();
         }
 
         public void Update(Config config)
         {
-            var existingConfig = context.Configs
-                .FirstOrDefault(c => c.Id == config.Id);
+            var existingConfig = context.Configs.Find(config.Id);
 
             if (existingConfig == null)
             {
@@ -37,8 +41,6 @@ namespace Fin.Infrastructure.Repositories
             existingConfig.Key = config.Key;
             existingConfig.Value = config.Value;
             existingConfig.IsActive = true;
-            context.Configs.Update(existingConfig);
-            context.SaveChanges();
         }
     }
 }

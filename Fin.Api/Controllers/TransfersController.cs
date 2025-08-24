@@ -8,8 +8,8 @@ namespace Fin.Api.Controllers;
 [Route("api/[controller]")]
 public class TransfersController(
     TransactionService service, 
-    ICreateTransferUseCase createTransferUseCase,
-    IUpdateTransferUseCase updateTransferUseCase) : ControllerBase
+    CreateTransferUseCase createTransferUseCase,
+    UpdateTransferUseCase updateTransferUseCase) : ControllerBase
 {
     [HttpPost]
     [Authorize]

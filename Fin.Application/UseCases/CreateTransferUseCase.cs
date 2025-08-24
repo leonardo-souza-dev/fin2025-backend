@@ -4,15 +4,10 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    public interface ICreateTransferUseCase
-    {
-        void Handle(CreateTransferRequest request, CancellationToken cancellationToken = default);
-    }
-    
     public class CreateTransferUseCase(
         ITransactionRepository transactionRepository,
         ITransferRepository transferRepository,
-        IUnitOfWork unitOfWork) : ICreateTransferUseCase
+        IUnitOfWork unitOfWork)
     {
         public void Handle(CreateTransferRequest request, CancellationToken cancellationToken = default)
         {
@@ -68,15 +63,4 @@ namespace Fin.Application.UseCases
         public required int ToAccountId { get; set; }
         public required bool IsRecurrence { get; set; }
     }
-
-    // public class CreateTransferResponse
-    // {
-    //     public required int Id { get; set; }
-    //     public required DateOnly Date { get; set; }
-    //     public required string Description { get; set; }
-    //     public required int FromAccountId { get; set; }
-    //     public required decimal Amount { get; set; }
-    //     public required int ToAccountId { get; set; }
-    //     public required int? RecurrenceId { get; set; }
-    // }
 }

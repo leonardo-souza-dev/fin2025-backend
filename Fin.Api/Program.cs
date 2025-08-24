@@ -33,19 +33,23 @@ public class Program
         builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+        builder.Services.AddScoped<IRecurrenceRepository, RecurrenceRepository>();
         
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        builder.Services.AddScoped<ICreateTransferUseCase, CreateTransferUseCase>();
-        builder.Services.AddScoped<IGetAccountsUseCase, GetAccountsUseCase>();
-        builder.Services.AddScoped<IGetBanksUseCase, GetBanksUseCase>();
-        builder.Services.AddScoped<IGetMonthUseCase, GetMonthUseCase>();
-        builder.Services.AddScoped<IUpdateTransferUseCase, UpdateTransferUseCase>();
-        
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<ConfigService>();
-        builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<CreateTransactionUseCase>();
+        builder.Services.AddScoped<CreateTransferUseCase>();
+        builder.Services.AddScoped<GetAccountsUseCase>();
+        builder.Services.AddScoped<GetBanksUseCase>();
+        builder.Services.AddScoped<GetMonthUseCase>();
+        builder.Services.AddScoped<RecurrenceService>();
         builder.Services.AddScoped<TransactionService>();
+        builder.Services.AddScoped<UpdateConfigUseCase>();
+        builder.Services.AddScoped<UpdateTransactionUseCase>();
+        builder.Services.AddScoped<UpdateTransferUseCase>();
+        builder.Services.AddScoped<UserService>();
     }
 
     public static void Main(string[] args)

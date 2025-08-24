@@ -6,7 +6,7 @@ namespace Fin.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountsController(IGetAccountsUseCase getAccountsUseCase) : ControllerBase
+public class AccountsController(GetAccountsUseCase getAccountsUseCase) : ControllerBase
 {
     [HttpGet]
     [Authorize]

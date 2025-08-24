@@ -3,8 +3,6 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Fin.Api.DTO;
 using Fin.Application.UseCases;
-using Fin.Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Fin.Api.IntegrationTests;

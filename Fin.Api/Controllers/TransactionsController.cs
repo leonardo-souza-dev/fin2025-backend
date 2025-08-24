@@ -7,23 +7,23 @@ namespace Fin.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TransactionsController(TransactionService service) : ControllerBase
+public class TransactionsController(
+    CreateTransactionUseCase createTransactionUseCase,
+    UpdateTransactionUseCase updateTransactionUseCase,
+    TransactionService service) : ControllerBase
 {
     [HttpPost]
     [Authorize]
-    public IActionResult Create([FromBody] TransactionRequest request)
-    {
-        var transaction = service.CreateSimple(request);
+    public IActionResult Create([FromBody] CreateTransactionRequest request) =>
+        CreatedAtAction(nameof(Create), createTransactionUseCase.Handle(request));
 
-        return CreatedAtAction(nameof(Create), new { id = transaction.Id }, transaction);
-    }
-
-    [HttpPut]
+    [HttpPut("{id:int}")]
     [Authorize]
-    public IActionResult Update([FromBody] Transaction request)
+    public IActionResult Update([FromRoute] int id, [FromBody] UpdateTransactionRequest request)
     {
-        var transaction = service.UpdateSimple(request);
-        return Ok(transaction);
+        request.Id = id;
+        updateTransactionUseCase.Handle(request);
+        return Ok();
     }
 
     [HttpDelete("{id}")]

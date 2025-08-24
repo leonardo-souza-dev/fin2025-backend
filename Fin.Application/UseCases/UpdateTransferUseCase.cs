@@ -3,17 +3,17 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    public interface IUpdateTransferUseCase
-    {
-        void Handle(UpdateTransferRequest request, CancellationToken cancellationToken = default);
-    }
+    // public interface IUpdateTransferUseCase
+    // {
+    //     void Handle(UpdateTransferRequest request);
+    // }
     
     public class UpdateTransferUseCase(
         ITransactionRepository transactionRepository,
         ITransferRepository transferRepository,
-        IUnitOfWork unitOfWork) : IUpdateTransferUseCase
+        IUnitOfWork unitOfWork)/* : IUpdateTransferUseCase*/
     {
-        public void Handle(UpdateTransferRequest request, CancellationToken cancellationToken = default)
+        public void Handle(UpdateTransferRequest request)
         {
             var transfer = transferRepository.Get(request.Id);
             if (transfer == null)

@@ -6,7 +6,7 @@ namespace Fin.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MonthsController(IGetMonthUseCase useCase) : ControllerBase
+public class MonthsController(GetMonthUseCase useCase) : ControllerBase
 {
     [HttpGet("year/{year}/month/{month}/accounts/{accountIds}")]
     [Authorize]

@@ -7,7 +7,9 @@ namespace Fin.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ConfigsController(ConfigService service) : ControllerBase
+public class ConfigsController(
+    ConfigService service,
+    UpdateConfigUseCase updateConfigUseCase) : ControllerBase
 {
     [HttpGet]
     [Authorize]
@@ -34,28 +36,12 @@ public class ConfigsController(ConfigService service) : ControllerBase
         return CreatedAtAction(nameof(Create), config);
     }
 
-    [HttpPut]
+    [HttpPut("{id:int:min(1)}")]
     [Authorize]
-    public IActionResult Update([FromBody] Config config)
+    public IActionResult Update([FromRoute] int id, [FromBody] UpdateConfigRequest request)
     {
-        if (config == null || !config.Id.HasValue)
-        {
-            return BadRequest("Config cannot be null or ID not found.");
-        }
-
-        try
-        {
-            service.Update(config);
-        }
-        catch (ArgumentOutOfRangeException ex)
-        {
-            return NotFound();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest("Entity does not exists. " + ex);
-        }
-
-        return Ok(config);
+        request.Id = id;
+        updateConfigUseCase.Handle(request);
+        return Ok();
     }
 }
