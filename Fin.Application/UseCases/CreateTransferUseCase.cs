@@ -5,13 +5,13 @@ using Fin.Infrastructure.Repositories;
 namespace Fin.Application.UseCases
 {
     public class CreateTransferUseCase(
-        ITransactionRepository transactionRepository,
+        IPaymentRepository paymentRepository, 
         ITransferRepository transferRepository,
         IUnitOfWork unitOfWork)
     {
         public void Handle(CreateTransferRequest request, CancellationToken cancellationToken = default)
         {
-            var transactionFrom = new Transaction
+            var paymentFrom = new Payment
             {
                 Date = request.Date,
                 Description = request.Description,
@@ -19,7 +19,7 @@ namespace Fin.Application.UseCases
                 Amount = request.Amount,
                 ToAccountId = request.ToAccountId,
             };
-            var transactionTo = new Transaction
+            var paymentTo = new Payment
             {
                 Date = request.Date,
                 Description = request.Description,
@@ -32,13 +32,13 @@ namespace Fin.Application.UseCases
 
             try
             {
-                var transactionFromCreated = transactionRepository.Create(transactionFrom);
-                var transactionToCreated = transactionRepository.Create(transactionTo);
+                var paymentFromCreated = paymentRepository.Create(paymentFrom);
+                var paymentToCreated = paymentRepository.Create(paymentTo);
 
                 var transfer = new Transfer
                 {
-                    FromTransactionId = transactionFromCreated.Id,
-                    ToTransactionId = transactionToCreated.Id
+                    PaymentFromId = paymentFromCreated.Id,
+                    PaymentToId = paymentToCreated.Id
                 };
                 _ = transferRepository.Create(transfer);
                 unitOfWork.SaveChanges();

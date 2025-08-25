@@ -3,10 +3,7 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    public class UpdateConfigUseCase(
-        IConfigRepository configRepository,
-        IUnitOfWork unitOfWork
-        )
+    public class UpdateConfigUseCase(IConfigRepository configRepository, IUnitOfWork unitOfWork)
     {
         public void Handle(UpdateConfigRequest request)
         {

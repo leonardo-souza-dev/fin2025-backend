@@ -1,5 +1,7 @@
 using Fin.Domain.Entities;
 using Fin.Application.UseCases;
+using Fin.Infrastructure.Data;
+using Fin.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
 using Moq;
 
@@ -7,9 +9,9 @@ namespace Fin.Application.Tests.UseCases;
 
 public class CreateTransferUseCaseTests
 {
-    private Mock<Fin.Infrastructure.Repositories.ITransactionRepository> _transactionRepositoryMock;
-    private Mock<Fin.Infrastructure.Repositories.ITransferRepository> _transferRepositoryMock;
-    private Mock<Fin.Infrastructure.Data.IUnitOfWork> _unitOfWorkMock;
+    private Mock<IPaymentRepository> _paymentRepositoryMock;
+    private Mock<ITransferRepository> _transferRepositoryMock;
+    private Mock<IUnitOfWork> _unitOfWorkMock;
     
     private Mock<IDbContextTransaction> _dbContextTransactionMock;
 
@@ -18,9 +20,9 @@ public class CreateTransferUseCaseTests
     [SetUp]
     public void Setup()
     {
-        _transactionRepositoryMock = new Mock<Fin.Infrastructure.Repositories.ITransactionRepository>();
-        _transferRepositoryMock = new Mock<Fin.Infrastructure.Repositories.ITransferRepository>();
-        _unitOfWorkMock = new Mock<Fin.Infrastructure.Data.IUnitOfWork>();
+        _paymentRepositoryMock = new Mock<IPaymentRepository>();
+        _transferRepositoryMock = new Mock<ITransferRepository>();
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
         
         _dbContextTransactionMock = new Mock<IDbContextTransaction>();
         _unitOfWorkMock
@@ -28,7 +30,7 @@ public class CreateTransferUseCaseTests
             .Returns(_dbContextTransactionMock.Object);
 
         _sut = new CreateTransferUseCase(
-            _transactionRepositoryMock.Object, 
+            _paymentRepositoryMock.Object, 
             _transferRepositoryMock.Object,
             _unitOfWorkMock.Object);
     }
@@ -37,7 +39,7 @@ public class CreateTransferUseCaseTests
     public void WhenPassingValidData_ShouldCreateTransfer()
     {
         // Arrange
-        var transactionFromCreated = new Transaction
+        var paymentFromCreated = new Payment
         {
             Id = 1001,
             Date = new DateOnly(2020, 1, 1),
@@ -49,7 +51,7 @@ public class CreateTransferUseCaseTests
             IsActive = true,
             TransferId = 5001
         };
-        var transactionToCreated = new Transaction
+        var paymentToCreated = new Payment
         {
             Id = 1002,
             Date = new DateOnly(2020, 1, 1),
@@ -62,12 +64,12 @@ public class CreateTransferUseCaseTests
             TransferId = 5001
         };
         
-        _transactionRepositoryMock
-            .Setup(x => x.Create(It.Is<Transaction>(t => t.Amount == -100)))
-            .Returns(transactionFromCreated);
-        _transactionRepositoryMock
-            .Setup(x => x.Create(It.Is<Transaction>(t => t.Amount == 100)))
-            .Returns(transactionToCreated);
+        _paymentRepositoryMock
+            .Setup(x => x.Create(It.Is<Payment>(t => t.Amount == -100)))
+            .Returns(paymentFromCreated);
+        _paymentRepositoryMock
+            .Setup(x => x.Create(It.Is<Payment>(t => t.Amount == 100)))
+            .Returns(paymentToCreated);
         
         var request = new CreateTransferRequest
         {
@@ -84,7 +86,7 @@ public class CreateTransferUseCaseTests
 
         // Assert
         _unitOfWorkMock.Verify(x => x.BeginTransaction(), Times.Once);
-        _transactionRepositoryMock.Verify(x => x.Create(It.IsAny<Transaction>()), Times.Exactly(2));
+        _paymentRepositoryMock.Verify(x => x.Create(It.IsAny<Payment>()), Times.Exactly(2));
         _unitOfWorkMock.Verify(x => x.SaveChanges(), Times.Once);
         _transferRepositoryMock.Verify(x => x.Create(It.IsAny<Transfer>()), Times.Once);
         _dbContextTransactionMock.Verify(x => x.Commit(), Times.Once);

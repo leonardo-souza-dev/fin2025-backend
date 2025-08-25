@@ -8,7 +8,7 @@ public class Transfer
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-    public required int FromTransactionId { get; set; }
-    public required int ToTransactionId { get; set; }
+    public required int PaymentFromId { get; set; }
+    public required int PaymentToId { get; set; }
     public bool IsActive { get; set; }
 }

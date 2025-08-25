@@ -1,6 +1,6 @@
 ﻿using Fin.Domain.Entities;
 
-namespace Fin.Api.Tests.Models;
+namespace Fin.Domain.Tests;
 
 public class FinalBalancePreviousMonthTests
 {
@@ -22,7 +22,7 @@ public class FinalBalancePreviousMonthTests
 
         // Arrange
         var date = new DateOnly(2050, 1, 1);
-        var transactions = new List<Transaction>
+        var payments = new List<Payment>
         {
             new() { Id = 1,  Date = new DateOnly(2025, 5, 1),  Description = "transfer resgate", FromAccountId = 16, Amount = -1234, ToAccountId = 62,   RecurrenceId = null, IsActive = true },
             new() { Id = 2,  Date = new DateOnly(2025, 5, 1),  Description = "transfer resgate", FromAccountId = 62, Amount = 1234,  ToAccountId = 16,   RecurrenceId = null, IsActive = true },
@@ -44,7 +44,7 @@ public class FinalBalancePreviousMonthTests
         };
 
         // Act
-        var sut = new FinalBalancePreviousMonth(year, month, accountIds, accountsDb, transactions);
+        var sut = new FinalBalancePreviousMonth(year, month, accountIds, accountsDb, payments);
 
         // Assert
         Assert.Multiple(() =>

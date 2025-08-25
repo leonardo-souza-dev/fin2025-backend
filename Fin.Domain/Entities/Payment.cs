@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Fin.Domain.Entities;
 
-public class Transaction
+public class Payment
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -18,18 +18,18 @@ public class Transaction
     public int? TransferId { get; set; }
     
     [NotMapped]
-    public int? TransactionIdTransferRelated { get; set; }
+    public int? PaymentIdTransferRelated { get; set; }
     
-    public string GetTransactionType() => ToAccountId != null ? "TRANSFER" : "SIMPLE";
+    public string GetPaymentType() => ToAccountId != null ? "TRANSFER" : "SIMPLE";
     public bool IsRecurrent() => RecurrenceId != null;
 
-    public Transaction CreateRelatedTransfer()
+    public Payment CreateRelatedTransfer()
     {
-        if (this.GetTransactionType() != "TRANSFER")
+        if (this.GetPaymentType() != "TRANSFER")
         {
-            throw new InvalidOperationException("Cannot invert accounts for a non-transfer transaction.");
+            throw new InvalidOperationException("Cannot invert accounts for a non-transfer payment.");
         }
-        return new Transaction
+        return new Payment
         {
             Date = Date,
             Description = Description,

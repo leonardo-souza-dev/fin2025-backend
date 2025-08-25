@@ -5,28 +5,26 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    public sealed class CreateTransactionUseCase(
-        ITransactionRepository repository,
-        IUnitOfWork unitOfWork)
+    public sealed class CreatePaymentUseCase(IPaymentRepository repository, IUnitOfWork unitOfWork)
     {
-        public CreateTransactionResponse Handle(CreateTransactionRequest request)
+        public CreatePaymentResponse Handle(CreatePaymentRequest request)
         {
-            var transaction = new Transaction
+            var payment = new Payment
             {
                 Date = request.Date,
                 Description = request.Description,
                 FromAccountId = request.FromAccountId,
                 Amount = request.Amount
             };
-            repository.Create(transaction);
+            repository.Create(payment);
             
             unitOfWork.SaveChanges();
 
-            return new CreateTransactionResponse(transaction);
+            return new CreatePaymentResponse(payment);
         }
     }
 
-    public sealed class CreateTransactionRequest
+    public sealed class CreatePaymentRequest
     {
         public required DateOnly Date { get; set; }
         public required string Description { get; set; }
@@ -34,7 +32,7 @@ namespace Fin.Application.UseCases
         public required decimal Amount { get; set; }
     }
 
-    public sealed class CreateTransactionResponse
+    public sealed class CreatePaymentResponse
     {
         public int Id { get; set; }
         public DateOnly Date { get; set; }
@@ -43,7 +41,7 @@ namespace Fin.Application.UseCases
         public decimal Amount { get; set; }
         
         [JsonConstructor]
-        public CreateTransactionResponse(int id, DateOnly date, string description, int fromAccountId, decimal amount)
+        public CreatePaymentResponse(int id, DateOnly date, string description, int fromAccountId, decimal amount)
         {
             Id = id;
             Date = date;
@@ -52,7 +50,7 @@ namespace Fin.Application.UseCases
             Amount = amount;
         }
 
-        public CreateTransactionResponse(Transaction entity)
+        public CreatePaymentResponse(Payment entity)
         {
             Id = entity.Id;
             Date = entity.Date;

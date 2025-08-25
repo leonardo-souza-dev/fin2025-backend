@@ -7,7 +7,7 @@ public class FinalBalancePreviousMonth(
     int month, 
     List<int> accountIds,
     IEnumerable<Account> accountDb,
-    IEnumerable<Transaction> transactions)
+    IEnumerable<Payment> payments)
 {
     public decimal Value
     { 
@@ -29,13 +29,13 @@ public class FinalBalancePreviousMonth(
                 throw new ArgumentException($"Accounts not found: {string.Join(", ", accountsNotFound.Select(id => id))}", nameof(accountIds));
             }
 
-            var allPreviousTransactions = transactions
+            var allPreviousPayments = payments
                 .Where(t => DateHelper.IsObj1BeforeObj2(t.Date.Year, t.Date.Month, year, month));
 
-            var allPreviousTransactionsAccount = allPreviousTransactions
+            var allPreviousPaymentsAccount = allPreviousPayments
                 .Where(t => accountIds.Contains(t.FromAccountId))
                 .ToList();
-            var finalBalance = allPreviousTransactionsAccount.Sum(t => t.Amount);
+            var finalBalance = allPreviousPaymentsAccount.Sum(t => t.Amount);
 
             return finalBalance;
         }

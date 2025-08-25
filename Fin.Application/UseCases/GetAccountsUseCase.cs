@@ -4,7 +4,7 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    public class GetAccountsUseCase(IAccountRepository accountRepository) 
+    public class GetAccountsUseCase(IAccountRepository accountRepository)
     {
         public GetAccountsResponse Handle()
         {

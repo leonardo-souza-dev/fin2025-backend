@@ -55,22 +55,6 @@ namespace Fin.Infrastructure.Repositories
 
         public void Delete(Transfer transfer)
         {
-            var fromTransaction = _context.Transactions.FirstOrDefault(t => t.Id == transfer.FromTransactionId) ??
-                                  throw new ArgumentException($"Transaction with ID {transfer.FromTransactionId} not found", nameof(transfer.FromTransactionId));
-
-            if (fromTransaction != null)
-            {
-                fromTransaction.IsActive = false;
-            }
-
-            var toTransaction = _context.Transactions.FirstOrDefault(t => t.Id == transfer.ToTransactionId) ??
-                                throw new ArgumentException($"Transaction with ID {transfer.ToTransactionId} not found", nameof(transfer.ToTransactionId));
-
-            if (toTransaction != null)
-            {
-                toTransaction.IsActive = false;
-            }
-
             transfer.IsActive = false;
         }
     }

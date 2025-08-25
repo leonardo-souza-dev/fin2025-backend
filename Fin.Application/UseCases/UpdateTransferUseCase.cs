@@ -3,15 +3,10 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    // public interface IUpdateTransferUseCase
-    // {
-    //     void Handle(UpdateTransferRequest request);
-    // }
-    
     public class UpdateTransferUseCase(
-        ITransactionRepository transactionRepository,
+        IPaymentRepository paymentRepository,
         ITransferRepository transferRepository,
-        IUnitOfWork unitOfWork)/* : IUpdateTransferUseCase*/
+        IUnitOfWork unitOfWork)
     {
         public void Handle(UpdateTransferRequest request)
         {
@@ -21,42 +16,42 @@ namespace Fin.Application.UseCases
                 throw new InvalidOperationException("Transfer not found");
             }
         
-            var transactionFrom = transactionRepository.Get(transfer.FromTransactionId);
-            if (transactionFrom == null)
+            var paymentFrom = paymentRepository.Get(transfer.PaymentFromId);
+            if (paymentFrom == null)
             {
-                throw new InvalidOperationException($"Transfer id {transfer.FromTransactionId} not found");
+                throw new InvalidOperationException($"Transfer id {transfer.PaymentFromId} not found");
             }
-            var transactionTo = transactionRepository.Get(transfer.ToTransactionId);
-            if (transactionTo == null)
+            var paymentTo = paymentRepository.Get(transfer.PaymentToId);
+            if (paymentTo == null)
             {
-                throw new InvalidOperationException($"Transfer id {transfer.ToTransactionId} not found");
+                throw new InvalidOperationException($"Transfer id {transfer.PaymentToId} not found");
             }
 
-            if (request.TransactionId == transactionFrom.Id)
+            if (request.PaymentId == paymentFrom.Id)
             {
-                transactionFrom.Date = request.Date;
-                transactionFrom.Description = request.Description;
-                transactionFrom.Amount = request.Amount;
-                transactionFrom.FromAccountId = request.FromAccountId;
-                transactionFrom.ToAccountId = request.ToAccountId;
+                paymentFrom.Date = request.Date;
+                paymentFrom.Description = request.Description;
+                paymentFrom.Amount = request.Amount;
+                paymentFrom.FromAccountId = request.FromAccountId;
+                paymentFrom.ToAccountId = request.ToAccountId;
                 //TODO: recurrences
                 
-                transactionTo.Date = request.Date;
-                transactionTo.Description = request.Description;
-                transactionTo.Amount = request.Amount * -1;
-                transactionTo.ToAccountId = request.FromAccountId;
-                transactionTo.FromAccountId = request.ToAccountId;
-            } else if (request.TransactionId == transactionTo.Id)
+                paymentTo.Date = request.Date;
+                paymentTo.Description = request.Description;
+                paymentTo.Amount = request.Amount * -1;
+                paymentTo.ToAccountId = request.FromAccountId;
+                paymentTo.FromAccountId = request.ToAccountId;
+            } else if (request.PaymentId == paymentTo.Id)
             {
-                transactionTo.Date = request.Date;
-                transactionTo.Description = request.Description;
-                transactionTo.Amount = request.Amount;
-                transactionTo.FromAccountId = request.FromAccountId;
+                paymentTo.Date = request.Date;
+                paymentTo.Description = request.Description;
+                paymentTo.Amount = request.Amount;
+                paymentTo.FromAccountId = request.FromAccountId;
                 
-                transactionFrom.Date = request.Date;
-                transactionFrom.Description = request.Description;
-                transactionFrom.Amount = request.Amount * -1;
-                transactionFrom.ToAccountId = request.ToAccountId;
+                paymentFrom.Date = request.Date;
+                paymentFrom.Description = request.Description;
+                paymentFrom.Amount = request.Amount * -1;
+                paymentFrom.ToAccountId = request.ToAccountId;
             }
         
             unitOfWork.SaveChanges();
@@ -66,7 +61,7 @@ namespace Fin.Application.UseCases
     public class UpdateTransferRequest
     {
         public required int Id { get; set; }
-        public required int TransactionId { get; set; }
+        public required int PaymentId { get; set; }
         public required DateOnly Date { get; set; }
         public required string Description { get; set; }
         public required decimal Amount { get; set; }

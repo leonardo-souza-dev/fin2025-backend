@@ -2,7 +2,7 @@
 
 namespace Fin.Domain.Tests;
 
-public class DayTransactionsTests
+public class DayPaymentsTests
 {
     [Test]
     [TestCase(-300, 100, 200, 0)]
@@ -13,7 +13,7 @@ public class DayTransactionsTests
     {
         // Arrange
         var date = new DateOnly(2050, 1, 1);
-        var transactions = new List<Transaction>
+        var payments = new List<Payment>
         {
             new() { Id = 1, Date = new DateOnly(2050, 1, 1), Description = "foo", Amount = amount1, FromAccountId = 10, IsActive = true },
             new() { Id = 2, Date = new DateOnly(2050, 1, 1), Description = "bar", Amount = amount2, FromAccountId = 10, IsActive = true },
@@ -29,21 +29,21 @@ public class DayTransactionsTests
         {
             new()
             {
-                FromTransactionId = 3,
+                PaymentFromId = 3,
                 IsActive = true,
-                ToTransactionId = 3
+                PaymentToId = 3
             }
         };
 
         // Act
-        var dayTransactions = new DayTransactions(initialBalance, date, transactions, transfers);
+        var dayPayments = new DayPayments(initialBalance, date, payments, transfers);
 
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(dayTransactions.Day, Is.EqualTo(date));
-            Assert.That(dayTransactions.Transactions, Has.Count.EqualTo(transactions.Count));
-            Assert.That(dayTransactions.FinalBalance, Is.EqualTo(finalBalance));
+            Assert.That(dayPayments.Day, Is.EqualTo(date));
+            Assert.That(dayPayments.Payments, Has.Count.EqualTo(payments.Count));
+            Assert.That(dayPayments.FinalBalance, Is.EqualTo(finalBalance));
         });
     }
 }

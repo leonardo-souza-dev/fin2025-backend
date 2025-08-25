@@ -4,71 +4,70 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fin.Infrastructure.Repositories
 {
-    public interface ITransactionRepository
+    public interface IPaymentRepository
     {
-        IQueryable<Transaction> GetAll();
-        Transaction? Get(int id);
-        Transaction Create(Transaction transaction);
-        void Update(Transaction transaction);
-        void Delete(Transaction transaction);
+        IQueryable<Payment> GetAll();
+        Payment? Get(int id);
+        Payment Create(Payment payment);
+        void Update(Payment payment);
+        void Delete(Payment payment);
     }
 
-    public class TransactionRepository(FinDbContext context) : ITransactionRepository
+    public class PaymentRepository(FinDbContext context) : IPaymentRepository
     {
-        public IEnumerable<Transaction> GetAll(int? year = null, int? month = null)
+        public IEnumerable<Payment> GetAll(int? year = null, int? month = null)
         {
-            var activeTransactions = context.Transactions.Where(t => t.IsActive);
+            var activePayments = context.Payments.Where(t => t.IsActive);
 
             if (year != null && month != null)
             {
-                return [.. activeTransactions.Where(t => t.Date.Year == year && t.Date.Month == month)];
+                return [.. activePayments.Where(t => t.Date.Year == year && t.Date.Month == month)];
             }
 
-            return [.. activeTransactions];
+            return [.. activePayments];
         }
         
-        public IQueryable<Transaction> GetAll()
+        public IQueryable<Payment> GetAll()
         {
-            var entities = context.Transactions
+            var entities = context.Payments
                 .Where(t => t.IsActive);
             return entities;
         }
 
-        public Transaction? FindAsync(int id)
+        public Payment? FindAsync(int id)
         {
-            var transaction = context.Transactions.Find(id);
-            return transaction != null && transaction.IsActive ? transaction : null;
+            var payment = context.Payments.Find(id);
+            return payment != null && payment.IsActive ? payment : null;
         }
         
-        public Transaction? Get(int id)
+        public Payment? Get(int id)
         {
-            var transaction = context.Transactions.Find(id);
-            return transaction != null && transaction.IsActive ? transaction : null;;
+            var payment = context.Payments.Find(id);
+            return payment != null && payment.IsActive ? payment : null;;
         }
 
-        public Transaction Create(Transaction transaction)
+        public Payment Create(Payment payment)
         {
-            ArgumentNullException.ThrowIfNull(transaction, nameof(transaction));
+            ArgumentNullException.ThrowIfNull(payment, nameof(payment));
 
-            transaction.IsActive = true;
+            payment.IsActive = true;
 
-            context.Transactions.Add(transaction);
+            context.Payments.Add(payment);
 
-            return transaction;
+            return payment;
         }
 
-        public void Update(Transaction transaction)
+        public void Update(Payment payment)
         {
-            ArgumentNullException.ThrowIfNull(transaction, nameof(transaction));
+            ArgumentNullException.ThrowIfNull(payment, nameof(payment));
             
-            transaction.IsActive = true;
-            context.Transactions.Update(transaction);
+            payment.IsActive = true;
+            context.Payments.Update(payment);
         }
 
-        public void Delete(Transaction transaction)
+        public void Delete(Payment payment)
         {
-            transaction.IsActive = false;
-            context.Transactions.Update(transaction);
+            payment.IsActive = false;
         }
     }
 }

@@ -7,9 +7,9 @@ namespace Fin.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class TransfersController(
-    TransactionService service, 
     CreateTransferUseCase createTransferUseCase,
-    UpdateTransferUseCase updateTransferUseCase) : ControllerBase
+    UpdateTransferUseCase updateTransferUseCase,
+    DeleteTransferUseCase deleteTransferUseCase) : ControllerBase
 {
     [HttpPost]
     [Authorize]
@@ -19,7 +19,7 @@ public class TransfersController(
         return Created();
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:int:min(1)}")]
     [Authorize]
     public IActionResult Update([FromRoute] int id, [FromBody] UpdateTransferRequest request)
     {
@@ -28,12 +28,11 @@ public class TransfersController(
         return Ok();
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:int:min(1)}")]
     [Authorize]
-    public IActionResult DeleteTransfer([FromRoute] int id)
+    public IActionResult Delete([FromRoute] int id)
     {
-        service.Delete(id);
-
+        deleteTransferUseCase.Handle(id);
         return NoContent();
     }
 }

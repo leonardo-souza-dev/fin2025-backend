@@ -5,7 +5,7 @@ using Fin.Infrastructure.Repositories;
 namespace Fin.Application.UseCases
 {
     public class GetMonthUseCase(
-        ITransactionRepository transactionRepository,
+        IPaymentRepository paymentRepository,
         IAccountRepository accountRepository,
         ITransferRepository transferRepository
         ) 
@@ -24,10 +24,10 @@ namespace Fin.Application.UseCases
             var accountIds = selectedAccountIds.Split(',').Select(id => int.Parse(id)).ToList();
 
             var allAccounts = accountRepository.GetAll();
-            var allTransactions = transactionRepository.GetAll();
+            var allPayments = paymentRepository.GetAll();
             var allTransfers = transferRepository.GetAll();
         
-            var month = new Month(yearNumber, monthNumber, accountIds, allAccounts, allTransactions, allTransfers);
+            var month = new Month(yearNumber, monthNumber, accountIds, allAccounts, allPayments, allTransfers);
 
             var response = new GetMonthResponse(month);
             return response;
@@ -37,45 +37,45 @@ namespace Fin.Application.UseCases
     public class GetMonthResponse
     {
         public decimal FinalBalancePreviousMonth { get; set; }
-        public List<DayTransactionsDto> DayTransactions { get; set; } = [];
+        public List<DayPaymentsDto> DayPayments { get; set; } = [];
 
         public GetMonthResponse(Month month)
         {
             FinalBalancePreviousMonth = month.FinalBalancePreviousMonth;
-            month.DayTransactions.ForEach(dt => DayTransactions.Add(new DayTransactionsDto(dt)));
+            month.DayPayments.ForEach(dt => DayPayments.Add(new DayPaymentsDto(dt)));
         }
         
         [JsonConstructor]
-        public GetMonthResponse(decimal finalBalancePreviousMonth, List<DayTransactionsDto> dayTransactions)
+        public GetMonthResponse(decimal finalBalancePreviousMonth, List<DayPaymentsDto> dayPayments)
         {
             FinalBalancePreviousMonth = finalBalancePreviousMonth;
-            DayTransactions = dayTransactions;
+            DayPayments = dayPayments;
         }
     }
 
-    public class DayTransactionsDto
+    public class DayPaymentsDto
     {
         public DateOnly Day { get; set; }
-        public List<TransactionDto> Transactions { get; set; } = [];
+        public List<PaymentDto> Payments { get; set; } = [];
         public decimal FinalBalance { get; set; }
 
-        public DayTransactionsDto(DayTransactions dayTransactions)
+        public DayPaymentsDto(DayPayments dayPayments)
         {
-            Day = dayTransactions.Day;
-            dayTransactions.Transactions.ForEach(t => Transactions.Add(new TransactionDto(t)));
-            FinalBalance = dayTransactions.FinalBalance;
+            Day = dayPayments.Day;
+            dayPayments.Payments.ForEach(t => Payments.Add(new PaymentDto(t)));
+            FinalBalance = dayPayments.FinalBalance;
         }
 
         [JsonConstructor]
-        public DayTransactionsDto(DateOnly day, List<TransactionDto> transactions, decimal finalBalance)
+        public DayPaymentsDto(DateOnly day, List<PaymentDto> payments, decimal finalBalance)
         {
             Day = day;
-            Transactions = transactions;
+            Payments = payments;
             FinalBalance = finalBalance;
         }
     }
 
-    public class TransactionDto
+    public class PaymentDto
     {
         public int Id { get; init; }
         public DateOnly Date { get; set; }
@@ -83,25 +83,25 @@ namespace Fin.Application.UseCases
         public int FromAccountId { get; set; }
         public decimal Amount { get; set; }
         public int? ToAccountId { get; set; }
-        public int? TransactionIdTransferRelated { get; set; }
+        public int? PaymentIdTransferRelated { get; set; }
         public int? TransferId { get; set; }
         public int? RecurrenceId { get; set; }
 
-        public TransactionDto(Transaction transaction)
+        public PaymentDto(Payment payment)
         {
-            Id = transaction.Id;
-            Date = transaction.Date;
-            Description = transaction.Description;
-            FromAccountId = transaction.FromAccountId;
-            Amount = transaction.Amount;
-            ToAccountId = transaction.ToAccountId;
-            TransactionIdTransferRelated = transaction.TransactionIdTransferRelated;
-            TransferId = transaction.TransferId;
-            RecurrenceId = transaction.RecurrenceId;
+            Id = payment.Id;
+            Date = payment.Date;
+            Description = payment.Description;
+            FromAccountId = payment.FromAccountId;
+            Amount = payment.Amount;
+            ToAccountId = payment.ToAccountId;
+            PaymentIdTransferRelated = payment.PaymentIdTransferRelated;
+            TransferId = payment.TransferId;
+            RecurrenceId = payment.RecurrenceId;
         }
 
         [JsonConstructor]
-        public TransactionDto(int id, DateOnly date, string description, int fromAccountId, decimal amount, int? toAccountId, int? transactionIdTransferRelated, int? transferId, int? recurrenceId)
+        public PaymentDto(int id, DateOnly date, string description, int fromAccountId, decimal amount, int? toAccountId, int? paymentIdTransferRelated, int? transferId, int? recurrenceId)
         {
             Id = id;
             Date = date;
@@ -109,7 +109,7 @@ namespace Fin.Application.UseCases
             FromAccountId = fromAccountId;
             Amount = amount;
             ToAccountId = toAccountId;
-            TransactionIdTransferRelated = transactionIdTransferRelated;
+            PaymentIdTransferRelated = paymentIdTransferRelated;
             TransferId = transferId;
             RecurrenceId = recurrenceId;
         }

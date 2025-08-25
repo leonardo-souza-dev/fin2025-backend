@@ -9,7 +9,7 @@ namespace Fin.Application.Tests.UseCases;
 
 public class UpdateTransferUseCaseTests
 {
-    private Mock<ITransactionRepository> _transactionRepositoryMock;
+    private Mock<IPaymentRepository> _paymentRepositoryMock;
     private Mock<ITransferRepository> _transferRepositoryMock;
     private Mock<IUnitOfWork> _unitOfWorkMock;
     
@@ -20,7 +20,7 @@ public class UpdateTransferUseCaseTests
     [SetUp]
     public void Setup()
     {
-        _transactionRepositoryMock = new Mock<ITransactionRepository>();
+        _paymentRepositoryMock = new Mock<IPaymentRepository>();
         _transferRepositoryMock = new Mock<ITransferRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         
@@ -30,7 +30,7 @@ public class UpdateTransferUseCaseTests
             .Returns(_dbContextTransactionMock.Object);
         
         _sut = new UpdateTransferUseCase(
-            _transactionRepositoryMock.Object,
+            _paymentRepositoryMock.Object,
             _transferRepositoryMock.Object,
             _unitOfWorkMock.Object);
     }
@@ -39,7 +39,7 @@ public class UpdateTransferUseCaseTests
     public void GivenValidTransfer_WhenUpdate_ShouldUpdateTransfer()
     {
         // Arrange
-        var transactionFrom = new Transaction
+        var paymentFrom = new Payment
         {
             Id = 1001,
             Amount = -100,
@@ -48,7 +48,7 @@ public class UpdateTransferUseCaseTests
             FromAccountId = 16,
             ToAccountId = 62
         };
-        var transactionTo = new Transaction
+        var paymentTo = new Payment
         {
             Id = 1002,
             Amount = 100,
@@ -60,23 +60,23 @@ public class UpdateTransferUseCaseTests
         var transfer = new Transfer
         {
             Id = 5001,
-            FromTransactionId = 1001,
-            ToTransactionId = 1002
+            PaymentFromId = 1001,
+            PaymentToId = 1002
         }; 
         _transferRepositoryMock
             .Setup(x => x.Get(5001))
             .Returns(transfer);
-        _transactionRepositoryMock
+        _paymentRepositoryMock
             .Setup(x => x.Get(1001))
-            .Returns(transactionFrom);
-        _transactionRepositoryMock
+            .Returns(paymentFrom);
+        _paymentRepositoryMock
             .Setup(x => x.Get(1002))
-            .Returns(transactionTo);
+            .Returns(paymentTo);
         
         var request = new UpdateTransferRequest
         {
             Id = 5001,
-            TransactionId = 1001,
+            PaymentId = 1001,
             Date = new DateOnly(2000, 1, 1),
             Description = "new description",
             Amount = -100,

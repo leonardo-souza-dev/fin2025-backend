@@ -4,7 +4,7 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    public class GetBanksUseCase(IBankRepository bankRepository) /*: IGetBanksUseCase*/
+    public class GetBanksUseCase(IBankRepository bankRepository)
     {
         public GetBanksResponse Handle()
         {

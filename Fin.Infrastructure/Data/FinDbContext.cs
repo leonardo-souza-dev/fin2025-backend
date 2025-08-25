@@ -9,7 +9,7 @@ public sealed class FinDbContext : DbContext
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Bank> Banks => Set<Bank>();
     public DbSet<Config> Configs => Set<Config>();
-    public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Recurrence> Recurrences => Set<Recurrence>();
     public DbSet<Transfer> Transfers => Set<Transfer>();
 
@@ -25,7 +25,7 @@ public sealed class FinDbContext : DbContext
         modelBuilder.Entity<User>().ToTable("users");
         modelBuilder.Entity<Bank>().ToTable("banks");
         modelBuilder.Entity<Config>().ToTable("configs");
-        modelBuilder.Entity<Transaction>().ToTable("transactions");
+        modelBuilder.Entity<Payment>().ToTable("payments");
         modelBuilder.Entity<Recurrence>().ToTable("recurrences");
         modelBuilder.Entity<Transfer>().ToTable("transfers");
 

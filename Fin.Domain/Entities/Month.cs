@@ -3,27 +3,27 @@ namespace Fin.Domain.Entities;
 public class Month
 {
     public decimal FinalBalancePreviousMonth { get; set; }
-    public List<DayTransactions> DayTransactions  { get; set; } = [];
+    public List<DayPayments> DayPayments  { get; set; } = [];
 
     public Month(
         int year, 
         int month, 
         List<int> selectedAccountIds, 
         IEnumerable<Account> allAccountsDb, 
-        IEnumerable<Transaction> allTransactionsDb,
+        IEnumerable<Payment> allPaymentsDb,
         IEnumerable<Transfer> allTransfersDb)
     {
-        var finalBalancePreviousMonth = new FinalBalancePreviousMonth(year, month, selectedAccountIds, allAccountsDb, allTransactionsDb);
+        var finalBalancePreviousMonth = new FinalBalancePreviousMonth(year, month, selectedAccountIds, allAccountsDb, allPaymentsDb);
         FinalBalancePreviousMonth = finalBalancePreviousMonth.Value;
         
-        var transactionsOfTheSelectedAccounts = allTransactionsDb
+        var paymentsOfTheSelectedAccounts = allPaymentsDb
             .Where(t => selectedAccountIds.Contains(t.FromAccountId));
 
-        var transactionsOfThisMonthAndSelectedAccounts = transactionsOfTheSelectedAccounts
+        var paymentsOfThisMonthAndSelectedAccounts = paymentsOfTheSelectedAccounts
             .Where(t => t.Date.Year == year && t.Date.Month == month).ToList();
 
-        var dates = transactionsOfThisMonthAndSelectedAccounts
-            .Select(transaction => transaction.Date)
+        var dates = paymentsOfThisMonthAndSelectedAccounts
+            .Select(p => p.Date)
             .Distinct()
             .OrderBy(date => date)
             .ToList();
@@ -32,13 +32,13 @@ public class Month
         for (int i = 0; i < dates.Count; i++)
         {
             DateOnly date = dates[i];
-            var transactionsDate = transactionsOfThisMonthAndSelectedAccounts
-                .Where(transaction => transaction.Date == date)
+            var paymentsDate = paymentsOfThisMonthAndSelectedAccounts
+                .Where(p => p.Date == date)
                 .ToList();
 
-            var dayTransaction = new DayTransactions(initialBalance, date, transactionsDate, allTransfersDb);
-            DayTransactions.Add(dayTransaction);
-            initialBalance = dayTransaction.FinalBalance;
+            var dayPayment = new DayPayments(initialBalance, date, paymentsDate, allTransfersDb);
+            DayPayments.Add(dayPayment);
+            initialBalance = dayPayment.FinalBalance;
         }
     }
 }

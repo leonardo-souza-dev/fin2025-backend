@@ -36,7 +36,7 @@ public class UpdateTransferUseCaseIntegrationTests
         var putResponse = await _client.PutAsJsonAsync("/api/transfers/51", new UpdateTransferRequest
         {
             Id = 51,
-            TransactionId = 1680,
+            PaymentId = 1680,
             Date = new DateOnly(2025, 8, 23),
             Description = "transfer87 new description",
             Amount = 5,
@@ -52,11 +52,11 @@ public class UpdateTransferUseCaseIntegrationTests
         var monthResponse = await httpResponseMessage.Content.ReadFromJsonAsync<GetMonthResponse>();
         Assert.That(monthResponse, Is.Not.Null);
 
-        var transaction = monthResponse.DayTransactions
-            .SelectMany(dt => dt.Transactions)
+        var payment = monthResponse.DayPayments
+            .SelectMany(dt => dt.Payments)
             .FirstOrDefault(t => t.Id == 1680);
-        Assert.That(transaction, Is.Not.Null);
-        Assert.That(transaction.Description, Is.EqualTo("transfer87 new description"));
+        Assert.That(payment, Is.Not.Null);
+        Assert.That(payment.Description, Is.EqualTo("transfer87 new description"));
     }
     
     [TearDown]
