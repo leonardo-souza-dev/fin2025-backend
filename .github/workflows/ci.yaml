@@ -35,7 +35,7 @@ jobs:
       - name: SonarCloud Begin
         run: |
           dotnet sonarscanner begin \
-          /k:"leonardo-souza_fin2025-backend" \
+          /k:"leonardo-souza-dev_fin2025-backend" \
           /o:"ltreze" \
           /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
           /d:sonar.cs.opencover.reportsPaths="coverage-results/coverage.json"
