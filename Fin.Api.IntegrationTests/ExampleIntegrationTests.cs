@@ -16,7 +16,7 @@ public class ExampleIntegrationTests : IntegrationTestBase
     public async Task Example_GetAccounts_ShouldReturnSeedAccounts()
     {
         // Arrange
-        await SetAccessTokenAsync();
+        _ = await LoginAndSetAccessTokenAsync();
 
         // Act
         var response = await Client.GetAsync("/api/accounts");
@@ -60,7 +60,7 @@ public class ExampleIntegrationTests : IntegrationTestBase
         dbContext.Banks.Add(newBank);
         await dbContext.SaveChangesAsync();
 
-        await SetAccessTokenAsync();
+        _ = await LoginAndSetAccessTokenAsync();
 
         // Act
         var response = await Client.GetAsync("/api/banks");
@@ -78,7 +78,7 @@ public class ExampleIntegrationTests : IntegrationTestBase
     public async Task Example_ErrorScenario_ShouldHandleErrorsCorrectly()
     {
         // Arrange
-        await SetAccessTokenAsync();
+        _ = await LoginAndSetAccessTokenAsync();
 
         // Act - Try to access a non-existent resource
         var response = await Client.GetAsync("/api/accounts/99999");

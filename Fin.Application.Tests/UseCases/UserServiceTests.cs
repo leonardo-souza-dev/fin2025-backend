@@ -1,5 +1,6 @@
 using Fin.Application.UseCases;
 using Fin.Domain.Entities;
+using Fin.Domain.Exceptions;
 using Fin.Infrastructure.Repositories;
 using Moq;
 
@@ -51,43 +52,7 @@ public class UserServiceTests
         var nonExistingEmail = "nonexisting@email.com";
 
         // Act
-        var result = _userService.GetUserByEmail(nonExistingEmail);
-
-        // Assert
-        Assert.That(result, Is.Null);
-    }
-
-    [Test]
-    public void WhenPassingExistingId_ShouldGetUser()
-    {
-        // Arrange
-        var id = 1;
-        var users = new List<User>
-        {
-            new() { Id = id, Email = "john@email.com", IsActive = true, Password = "123456789", Role = "user" },
-            new() { Id = 2, Email = "alice@email.com", IsActive = true, Password = "123456789", Role = "user" }
-        }.AsQueryable();
-
-        _userRepositoryMock.Setup(x => x.GetUserById(id)).Returns(users.FirstOrDefault(u => u.Id == id));
-
-        // Act
-        var result = _userService.GetUserById(id);
-
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.InstanceOf<User>());
-        Assert.That(result.Id, Is.EqualTo(id));
-    }
-
-    [Test]
-    public void WhenPassingNonExistingId_ShouldNotGetUser()
-    {
-        // Arrange
-        // Act
-        var result = _userService.GetUserById(999);
-
-        // Assert
-        Assert.That(result, Is.Null);
+        Assert.Throws<UserNotFoundException>(() => _userService.GetUserByEmail(nonExistingEmail));
     }
 
     [Test]

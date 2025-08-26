@@ -13,7 +13,7 @@ public class UpdateTransferUseCaseIntegrationTests : IntegrationTestBase
     public async Task GivenATransfer_WhenUpdateTransfer_ThenShouldUpdateTransfer()
     {
         // Arrange
-        await SetAccessTokenAsync();
+        _ = await LoginAndSetAccessTokenAsync();
 
         // Get the actual IDs from the seeded data
         using var scope = Factory.Services.CreateScope();

@@ -1,4 +1,5 @@
 ﻿using Fin.Domain.Entities;
+using Fin.Domain.Exceptions;
 using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases;
@@ -12,12 +13,14 @@ public class UserService(IUserRepository repository)
             throw new ArgumentNullException(nameof(email), "Email cannot be null");
         }
 
-        return repository.GetUserByEmail(email);
-    }
+        var user = repository.GetUserByEmail(email);
 
-    public User? GetUserById(int id)
-    {
-        return repository.GetUserById(id);
+        if (user == null)
+        {
+            throw new UserNotFoundException(nameof(email), email);
+        }
+        
+        return user;
     }
 
     public void Upsert(User user)

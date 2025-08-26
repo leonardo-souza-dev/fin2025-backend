@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Fin.Api.DTO;
+using Fin.Application.UseCases;
 
 namespace Fin.Api.IntegrationTests;
 
@@ -22,10 +22,10 @@ public abstract class IntegrationTestBase
     {
         Client.Dispose();
         await Factory.StopAsync();
-        Factory.Dispose();
+        await Factory.DisposeAsync();
     }
 
-    protected async Task SetAccessTokenAsync()
+    protected async Task<string> LoginAndSetAccessTokenAsync()
     {
         var loginHttpResponse = await Client.PostAsJsonAsync("/api/auth/login", new LoginRequest
         {
@@ -35,5 +35,7 @@ public abstract class IntegrationTestBase
         
         var loginResponse = await loginHttpResponse.Content.ReadFromJsonAsync<LoginResponse>();
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse!.AccessToken);
+        
+        return loginResponse.AccessToken;
     }
 }

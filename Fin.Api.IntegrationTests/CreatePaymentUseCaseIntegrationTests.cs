@@ -13,14 +13,14 @@ public class CreatePaymentUseCaseIntegrationTests : IntegrationTestBase
     public async Task GivenAPayment_WhenCreate_ThenShouldCreate()
     {
         // Arrange
-        await SetAccessTokenAsync();
+        _ = await LoginAndSetAccessTokenAsync();
 
         // Get the actual account ID from the seeded data
         using var scope = Factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<FinDbContext>();
         var fromAccount = await dbContext.Accounts.FirstAsync();
 
-        // Act & Assert
+        // Act
         var postResponse = await Client.PostAsJsonAsync("/api/payments", new CreatePaymentRequest
         {
             Date = new DateOnly(2050, 1, 1),
@@ -28,6 +28,8 @@ public class CreatePaymentUseCaseIntegrationTests : IntegrationTestBase
             Amount = -100,
             FromAccountId = fromAccount.Id!.Value
         });
+        
+        // Assert
         Assert.That(postResponse.StatusCode, Is.EqualTo(HttpStatusCode.Created));
 
         var createPaymentResponse = await postResponse.Content.ReadFromJsonAsync<CreatePaymentResponse>();

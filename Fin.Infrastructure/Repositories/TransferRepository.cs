@@ -31,7 +31,7 @@ namespace Fin.Infrastructure.Repositories
         public Transfer? Get(int id)
         {
             var transfer = _context.Transfers.Find(id);
-            return transfer != null && transfer.IsActive ? transfer : null;;
+            return transfer != null && transfer.IsActive ? transfer : null;
         }
 
         public Transfer Create(Transfer transfer)

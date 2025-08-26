@@ -10,7 +10,7 @@ public class GetAccountsUseCaseIntegrationTests : IntegrationTestBase
     public async Task ShouldGetAllActiveAccounts()
     {
         // Arrange
-        await SetAccessTokenAsync();
+        _ = await LoginAndSetAccessTokenAsync();
 
         // Act
         var httpResponseMessage = await Client.GetAsync("/api/accounts");

@@ -6,7 +6,7 @@ namespace Fin.Infrastructure.Repositories;
 public interface IUserRepository
 {
     User? GetUserByEmail(string email);
-    User? GetUserById(int id);
+    User? Get(int id);
     void Upsert(User user);
 }
 
@@ -14,40 +14,14 @@ public class UserRepository(FinDbContext context) : IUserRepository
 {
     public User? GetUserByEmail(string email)
     {
-        var users = context.Users
-            .Where(u => u.Email == email)
-            .ToList();
-
-        if (users.Count == 0)
-        {
-            return null;
-        }
-
-        if (users.Count > 1)
-        {
-            throw new InvalidOperationException($"Multiple users found with email: {email}");
-        }
-
-        return users.First();
+        var user = context.Users.FirstOrDefault(u => u.Email == email);
+        return user;
     }
 
-    public User? GetUserById(int id)
+    public User? Get(int id)
     {
-        var users = context.Users
-            .Where(u => u.Id == id)
-            .ToList();
-
-        if (users.Count == 0)
-        {
-            return null;
-        }
-
-        if (users.Count > 1)
-        {
-            throw new InvalidOperationException($"Multiple users found with Id: {id}");
-        }
-
-        return users.First();
+        var user = context.Users.Find(id);
+        return user != null && user.IsActive ? user : null;;
     }
 
     public void Upsert(User user)

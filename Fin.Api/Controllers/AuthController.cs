@@ -1,5 +1,4 @@
-﻿using Fin.Api.DTO;
-using Fin.Domain.Entities;
+﻿using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Fin.Application.UseCases;
@@ -9,8 +8,10 @@ namespace Fin.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController(
-    AuthService authService, 
-    UserService userService
+    IAuthService authService, 
+    UserService userService,
+    LoginUseCase loginUseCase,
+    RefreshTokenUseCase refreshTokenUseCase
     ) : ControllerBase
 {
     private const string REFRESH_TOKEN_KEY = "refreshToken";
@@ -18,67 +19,24 @@ public class AuthController(
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        var user = userService.GetUserByEmail(request.Email);
-        if (user == null)
+        var cookies = Response.Cookies;
+        var loginResponse = loginUseCase.Handle(request, ref cookies);
+        
+        return Ok(new LoginResponse
         {
-            return Unauthorized("User not found.");
-        }
-        if (!PasswordHasher.VerifyPassword(request.Password, user.Password))
-        {
-            return Unauthorized("Invalid credentials");
-        }
-
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Email, user.Email)/*,
-            new(ClaimTypes.Role, user.Role)*/
-        };
-
-        var accessToken = authService.GenerateAccessToken(claims);
-        var refreshToken = authService.GenerateRefreshToken(user.Id);
-
-        Response.Cookies.Append(REFRESH_TOKEN_KEY, refreshToken, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Path = "/"
+            AccessToken = loginResponse.AccessToken,
+            RefreshToken = loginResponse.RefreshToken
         });
-        return Ok(new LoginResponse { AccessToken = accessToken });
     }
 
     [HttpPost("refresh")]
     public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
     {
-        if (!Request.Cookies.TryGetValue(REFRESH_TOKEN_KEY, out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
-        {
-            return Unauthorized(new { message = "Not authorized" });
-        }
-
-        var accessToken = request.AccessToken;
-
-        var principal = authService.GetPrincipalFromExpiredToken(accessToken);
-        var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        var user = userService.GetUserById(int.Parse(userId!));
-        if (user == null)
-        {
-            return BadRequest("User not found");
-        }
-
-        var newRefreshToken = authService.GenerateRefreshToken(user.Id);
-        Response.Cookies.Append(REFRESH_TOKEN_KEY, newRefreshToken, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            //Expires = _authService.GetRefreshTokenExpiry()
-            Path = "/"
-        });
-
-        var newAccessToken = authService.GenerateAccessToken(principal.Claims);
-        return Ok(new { AccessToken = newAccessToken });
+        var requestCookies = Request.Cookies;
+        var responseCookies = Response.Cookies;
+        var response = refreshTokenUseCase.Handle(request, ref requestCookies, ref responseCookies);
+        
+        return Ok(response);
     }
 
     [HttpPost("register")]

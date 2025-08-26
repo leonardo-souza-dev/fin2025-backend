@@ -37,7 +37,7 @@ public class Program
         
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ConfigService>();
         builder.Services.AddScoped<CreatePaymentUseCase>();
         builder.Services.AddScoped<CreateTransferUseCase>();
@@ -46,7 +46,9 @@ public class Program
         builder.Services.AddScoped<GetAccountsUseCase>();
         builder.Services.AddScoped<GetBanksUseCase>();
         builder.Services.AddScoped<GetMonthUseCase>();
+        builder.Services.AddScoped<LoginUseCase>();
         builder.Services.AddScoped<RecurrenceService>();
+        builder.Services.AddScoped<RefreshTokenUseCase>();
         builder.Services.AddScoped<UpdateConfigUseCase>();
         builder.Services.AddScoped<UpdatePaymentUseCase>();
         builder.Services.AddScoped<UpdateTransferUseCase>();
@@ -154,6 +156,7 @@ public class Program
         app.UseCors(myAllowSpecificOrigins);// before useAuthentication, and useAuthorization
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseMiddleware(typeof(ErrorHandlingMiddleware));
         app.UseSwagger();
         app.UseSwaggerUI();
         app.UseHttpsRedirection();
