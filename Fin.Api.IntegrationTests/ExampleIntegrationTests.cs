@@ -30,20 +30,19 @@ public class ExampleIntegrationTests : IntegrationTestBase
     }
 
     [Test]
-    public async Task Example_AccessDatabase_ShouldAllowDirectDatabaseAccess()
+    public void Example_AccessDatabase_ShouldAllowDirectDatabaseAccess()
     {
         // Arrange & Act - Access database directly if needed
         using var scope = Factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<FinDbContext>();
-        
-        var userCount = await dbContext.Users.CountAsync();
-        var bankCount = await dbContext.Banks.CountAsync();
-        var accountCount = await dbContext.Accounts.CountAsync();
 
         // Assert
-        Assert.That(userCount, Is.EqualTo(1));
-        Assert.That(bankCount, Is.EqualTo(2));
-        Assert.That(accountCount, Is.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(dbContext.Users.ToList(), Has.Count.EqualTo(1));
+            Assert.That(dbContext.Banks.ToList(), Has.Count.EqualTo(2));
+            Assert.That(dbContext.Accounts.ToList(), Has.Count.EqualTo(2));
+        });
     }
 
     [Test]

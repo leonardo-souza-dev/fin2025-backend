@@ -38,13 +38,21 @@ jobs:
           /k:"leonardo-souza-dev_fin2025-backend" \
           /o:"ltreze" \
           /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
-          /d:sonar.cs.opencover.reportsPaths="coverage-results/coverage.json"
+          /d:sonar.host.url="https://sonarcloud.io" \
+          /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+          /d:sonar.cs.vstest.reportsPaths="**/TestResults.xml" \
+          /d:sonar.coverage.exclusions="**/Program.cs,**/Migrations/**" \
+          /d:sonar.exclusions="**/bin/**,**/obj/**,**/Migrations/**"
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
       - name: Test with Coverage
-        run: dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:CoverletOutput=coverage-results/coverage.json
+        run: |
+          dotnet test --no-build --configuration Release \
+          --logger "trx;LogFileName=TestResults.xml" \
+          --collect:"XPlat Code Coverage" \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: SonarCloud End
         run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
