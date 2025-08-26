@@ -10,11 +10,11 @@ public class User
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Email is required.")]
-    [MaxLength(50)]
+    [MaxLength(100)]
     public required string Email { get; set; }
 
     [Required(ErrorMessage = "Email is required.")]
-    [MaxLength(50)]
+    [MaxLength(100)]
     public required string Password { get; set; }
 
     public string? Role { get; set; }

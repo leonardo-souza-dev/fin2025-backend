@@ -1,68 +1,53 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Fin.Api.DTO;
 using Fin.Application.UseCases;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Fin.Infrastructure.Data;
 
 namespace Fin.Api.IntegrationTests;
 
-public class UpdateTransferUseCaseIntegrationTests
+public class UpdateTransferUseCaseIntegrationTests : IntegrationTestBase
 {
-    private HttpClient _client = null!;
-    private WebApplicationFactory<Program> _factory = null!;
-    
-    [SetUp]
-    public void Setup()
-    {
-        _factory = new WebApplicationFactory<Program>();
-        _client = _factory.CreateClient();
-    }
-
     [Test]
     public async Task GivenATransfer_WhenUpdateTransfer_ThenShouldUpdateTransfer()
     {
         // Arrange
-        var loginHttpResponse = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest
-        {
-            Email = "user@email.com",
-            Password = "12345678"
-        });
-        var loginResponse = await loginHttpResponse.Content.ReadFromJsonAsync<LoginResponse>();
+        await SetAccessTokenAsync();
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse.AccessToken);
+        // Get the actual IDs from the seeded data
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<FinDbContext>();
+        
+        var transfer = await dbContext.Transfers.FirstAsync();
+        var payment = await dbContext.Payments.FirstAsync(p => p.Id == transfer.PaymentFromId);
+        var fromAccount = await dbContext.Accounts.FirstAsync();
+        var toAccount = await dbContext.Accounts.Skip(1).FirstAsync();
 
         // Act & Assert
-        var putResponse = await _client.PutAsJsonAsync("/api/transfers/51", new UpdateTransferRequest
+        var putResponse = await Client.PutAsJsonAsync($"/api/transfers/{transfer.Id}", new UpdateTransferRequest
         {
-            Id = 51,
-            PaymentId = 1680,
+            Id = transfer.Id,
+            PaymentId = payment.Id,
             Date = new DateOnly(2025, 8, 23),
             Description = "transfer87 new description",
             Amount = 5,
-            FromAccountId = 16,
-            ToAccountId = 62,
+            FromAccountId = fromAccount.Id!.Value,
+            ToAccountId = toAccount.Id!.Value,
             IsRecurrence = false
         });
         Assert.That(putResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
-        var httpResponseMessage = await _client.GetAsync($"/api/months/year/2025/month/8/accounts/16,62");
+        var httpResponseMessage = await Client.GetAsync($"/api/months/year/2025/month/8/accounts/{fromAccount.Id},{toAccount.Id}");
         Assert.That(httpResponseMessage.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         Assert.NotNull(httpResponseMessage);
         var monthResponse = await httpResponseMessage.Content.ReadFromJsonAsync<GetMonthResponse>();
         Assert.That(monthResponse, Is.Not.Null);
 
-        var payment = monthResponse.DayPayments
+        var updatedPayment = monthResponse.DayPayments
             .SelectMany(dt => dt.Payments)
-            .FirstOrDefault(t => t.Id == 1680);
-        Assert.That(payment, Is.Not.Null);
-        Assert.That(payment.Description, Is.EqualTo("transfer87 new description"));
-    }
-    
-    [TearDown]
-    public void TearDown()
-    {
-        _client.Dispose();
-        _factory.Dispose();
+            .FirstOrDefault(t => t.Id == payment.Id);
+        Assert.That(updatedPayment, Is.Not.Null);
+        Assert.That(updatedPayment.Description, Is.EqualTo("transfer87 new description"));
     }
 }

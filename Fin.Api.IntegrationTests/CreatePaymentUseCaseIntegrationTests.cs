@@ -1,37 +1,32 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Fin.Api.DTO;
 using Fin.Application.UseCases;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Fin.Infrastructure.Data;
 
 namespace Fin.Api.IntegrationTests;
 
-public class CreatePaymentUseCaseIntegrationTests
+public class CreatePaymentUseCaseIntegrationTests : IntegrationTestBase
 {
-    private HttpClient _client = null!;
-    private WebApplicationFactory<Program> _factory = null!;
-    
-    [SetUp]
-    public void Setup()
-    {
-        _factory = new WebApplicationFactory<Program>();
-        _client = _factory.CreateClient();
-    }
-
     [Test]
     public async Task GivenAPayment_WhenCreate_ThenShouldCreate()
     {
         // Arrange
-        await SetAccessToken();
+        await SetAccessTokenAsync();
+
+        // Get the actual account ID from the seeded data
+        using var scope = Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<FinDbContext>();
+        var fromAccount = await dbContext.Accounts.FirstAsync();
 
         // Act & Assert
-        var postResponse = await _client.PostAsJsonAsync("/api/payments", new CreatePaymentRequest
+        var postResponse = await Client.PostAsJsonAsync("/api/payments", new CreatePaymentRequest
         {
             Date = new DateOnly(2050, 1, 1),
             Description = "payment test from integration tests",
             Amount = -100,
-            FromAccountId = 16
+            FromAccountId = fromAccount.Id!.Value
         });
         Assert.That(postResponse.StatusCode, Is.EqualTo(HttpStatusCode.Created));
 
@@ -43,25 +38,7 @@ public class CreatePaymentUseCaseIntegrationTests
             Assert.That(createPaymentResponse.Date, Is.EqualTo(new DateOnly(2050, 1, 1)));
             Assert.That(createPaymentResponse.Description, Is.EqualTo("payment test from integration tests"));
             Assert.That(createPaymentResponse.Amount, Is.EqualTo(-100));
-            Assert.That(createPaymentResponse.FromAccountId, Is.EqualTo(16));
+            Assert.That(createPaymentResponse.FromAccountId, Is.EqualTo(fromAccount.Id!.Value));
         });
-    }
-
-    private async Task SetAccessToken()
-    {
-        var loginHttpResponse = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest
-        {
-            Email = "user@email.com",
-            Password = "12345678"
-        });
-        var loginResponse = await loginHttpResponse.Content.ReadFromJsonAsync<LoginResponse>();
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse.AccessToken);
-    }
-    
-    [TearDown]
-    public void TearDown()
-    {
-        _client.Dispose();
-        _factory.Dispose();
     }
 }
