@@ -1,7 +1,8 @@
 using System.Net;
 using System.Text;
+using Fin.Api.IntegrationTests.Base;
 
-namespace Fin.Api.IntegrationTests;
+namespace Fin.Api.IntegrationTests.Auth;
 
 public class RefreshTokenUseCaseIntegrationTests : IntegrationTestBase
 {

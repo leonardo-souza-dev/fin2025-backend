@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.EntityFrameworkCore;
+using Fin.Api.IntegrationTests.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Fin.Infrastructure.Data;
 
-namespace Fin.Api.IntegrationTests;
+namespace Fin.Api.IntegrationTests.Base;
 
 /// <summary>
 /// Exemplo de teste de integração usando TestContainers

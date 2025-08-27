@@ -1,5 +1,4 @@
 using Fin.Application.UseCases;
-using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,8 +13,10 @@ public class PaymentsController(
 {
     [HttpPost]
     [Authorize]
-    public IActionResult Create([FromBody] CreatePaymentRequest request) =>
-        CreatedAtAction(nameof(Create), createPaymentUseCase.Handle(request));
+    public IActionResult Create([FromBody] CreatePaymentRequest request)
+    {
+        return CreatedAtAction(nameof(Create), createPaymentUseCase.Handle(request));
+    }
 
     [HttpPut("{id:int:min(1)}")]
     [Authorize]

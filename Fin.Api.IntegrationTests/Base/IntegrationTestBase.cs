@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Fin.Application.UseCases;
 
-namespace Fin.Api.IntegrationTests;
+namespace Fin.Api.IntegrationTests.Base;
 
 public abstract class IntegrationTestBase
 {

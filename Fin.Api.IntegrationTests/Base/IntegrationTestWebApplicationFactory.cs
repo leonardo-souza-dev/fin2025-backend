@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.PostgreSql;
 using Fin.Infrastructure.Data;
 
-namespace Fin.Api.IntegrationTests;
+namespace Fin.Api.IntegrationTests.Base;
 
 public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Program>
 {
