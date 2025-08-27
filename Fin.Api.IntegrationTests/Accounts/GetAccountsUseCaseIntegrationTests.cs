@@ -1,9 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using Fin.Api.IntegrationTests.Base;
-using Fin.Domain.Entities;
 
-namespace Fin.Api.IntegrationTests.Account;
+namespace Fin.Api.IntegrationTests.Accounts;
 
 public class GetAccountsUseCaseIntegrationTests : IntegrationTestBase
 {

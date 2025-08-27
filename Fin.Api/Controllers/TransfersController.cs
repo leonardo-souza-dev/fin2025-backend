@@ -15,8 +15,8 @@ public class TransfersController(
     [Authorize]
     public IActionResult Create([FromBody] CreateTransferRequest request)
     {
-        createTransferUseCase.Handle(request);
-        return Created();
+        var response = createTransferUseCase.Handle(request);
+        return CreatedAtAction(nameof(Create), response);
     }
 
     [HttpPut("{id:int:min(1)}")]

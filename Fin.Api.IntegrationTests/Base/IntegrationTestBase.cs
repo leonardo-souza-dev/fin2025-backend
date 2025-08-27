@@ -10,7 +10,7 @@ public abstract class IntegrationTestBase
     protected IntegrationTestWebApplicationFactory Factory = null!;
 
     [SetUp]
-    public async Task InitializeAsync()
+    public virtual async Task InitializeAsync()
     {
         Factory = new IntegrationTestWebApplicationFactory();
         await Factory.InitializeAsync();

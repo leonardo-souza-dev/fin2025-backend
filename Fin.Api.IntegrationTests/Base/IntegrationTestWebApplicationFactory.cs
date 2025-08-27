@@ -1,3 +1,4 @@
+using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -93,8 +94,8 @@ public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Progra
         dbContext.Users.Add(user);
 
         // Add test banks
-        var bank1 = new Fin.Domain.Entities.Bank { Name = "Test Bank 1", IsActive = true };
-        var bank2 = new Fin.Domain.Entities.Bank { Name = "Test Bank 2", IsActive = true };
+        var bank1 = new Bank { Name = "Test Bank 1", IsActive = true };
+        var bank2 = new Bank { Name = "Test Bank 2", IsActive = true };
         dbContext.Banks.Add(bank1);
         dbContext.Banks.Add(bank2);
         dbContext.SaveChanges(); // Save to get IDs

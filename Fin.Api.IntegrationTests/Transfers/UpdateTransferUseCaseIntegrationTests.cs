@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Fin.Infrastructure.Data;
 
-namespace Fin.Api.IntegrationTests.Transfer;
+namespace Fin.Api.IntegrationTests.Transfers;
 
 public class UpdateTransferUseCaseIntegrationTests : IntegrationTestBase
 {

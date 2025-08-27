@@ -2,25 +2,20 @@ using System.Net;
 using System.Net.Http.Json;
 using Fin.Api.IntegrationTests.Base;
 using Fin.Application.UseCases;
-using System.Net;
-using System.Net.Http.Json;
-using Fin.Api.IntegrationTests.Base;
-using Fin.Application.UseCases;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Fin.Infrastructure.Data;
 
-namespace Fin.Api.IntegrationTests.Payment;
+namespace Fin.Api.IntegrationTests.Payments;
 
 public class UpdatePaymentUseCaseIntegrationTests : IntegrationTestBase
 {
     private List<int?> _accountIds;
     
     [SetUp]
-    public async Task SetUp()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        //var createAccount = await Client.
+        
         using var scope = Factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<FinDbContext>();
         _accountIds = dbContext.Accounts.Select(x => x.Id).ToList();

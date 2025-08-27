@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Fin.Infrastructure.Data;
 
-namespace Fin.Api.IntegrationTests.Payment;
+namespace Fin.Api.IntegrationTests.Payments;
 
 public class CreatePaymentUseCaseIntegrationTests : IntegrationTestBase
 {

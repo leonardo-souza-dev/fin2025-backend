@@ -9,7 +9,7 @@ namespace Fin.Application.UseCases
         ITransferRepository transferRepository,
         IUnitOfWork unitOfWork)
     {
-        public void Handle(CreateTransferRequest request, CancellationToken cancellationToken = default)
+        public CreateTransferResponse Handle(CreateTransferRequest request, CancellationToken cancellationToken = default)
         {
             var paymentFrom = new Payment
             {
@@ -44,6 +44,8 @@ namespace Fin.Application.UseCases
                 unitOfWork.SaveChanges();
 
                 uowTransaction.Commit();
+                
+                return CreateTransferResponse.Of(transfer);
             }
             catch (Exception ex)
             {
@@ -62,5 +64,22 @@ namespace Fin.Application.UseCases
         public required decimal Amount { get; set; }
         public required int ToAccountId { get; set; }
         public required bool IsRecurrence { get; set; }
+    }
+
+    public class CreateTransferResponse
+    {
+        public int Id { get; set; }
+        public int PaymentFromId { get; set; }
+        public int PaymentToId { get; set; }
+
+        public static CreateTransferResponse Of(Transfer transfer)
+        {
+            return new CreateTransferResponse
+            {
+                Id = transfer.Id,
+                PaymentFromId = transfer.PaymentFromId,
+                PaymentToId = transfer.PaymentToId
+            };
+        }
     }
 }
