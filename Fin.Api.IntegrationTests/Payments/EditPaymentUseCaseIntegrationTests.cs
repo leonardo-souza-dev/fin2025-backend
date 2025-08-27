@@ -7,7 +7,7 @@ using Fin.Infrastructure.Data;
 
 namespace Fin.Api.IntegrationTests.Payments;
 
-public class UpdatePaymentUseCaseIntegrationTests : IntegrationTestBase
+public class EditPaymentUseCaseIntegrationTests : IntegrationTestBase
 {
     private List<int?> _accountIds;
     
@@ -22,7 +22,7 @@ public class UpdatePaymentUseCaseIntegrationTests : IntegrationTestBase
     }
     
     [Test]
-    public async Task GivenAValidRequest_MustUpdatePayment()
+    public async Task GivenAValidRequest_MustEditPayment()
     {
         // Arrange
         _ = await LoginAndSetAccessTokenAsync();
@@ -40,7 +40,7 @@ public class UpdatePaymentUseCaseIntegrationTests : IntegrationTestBase
         Assert.True(createPaymentPostResponse.IsSuccessStatusCode);
         var createPaymentResponse = await createPaymentPostResponse.Content.ReadFromJsonAsync<CreatePaymentResponse>();
         // Act
-        var actual = await Client.PutAsJsonAsync($"/api/payments/{createPaymentResponse.Id}", new UpdatePaymentRequest
+        var actual = await Client.PutAsJsonAsync($"/api/payments/{createPaymentResponse.Id}", new EditPaymentRequest
         {
             Id = createPaymentResponse.Id,
             Date = new DateOnly(2050, 1, 2),

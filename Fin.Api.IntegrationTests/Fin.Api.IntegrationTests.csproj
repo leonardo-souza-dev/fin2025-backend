@@ -30,4 +30,8 @@
         <ProjectReference Include="..\Fin.Api\Fin.Api.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Configs\" />
+    </ItemGroup>
+
 </Project>

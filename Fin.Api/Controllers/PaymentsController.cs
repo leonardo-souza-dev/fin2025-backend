@@ -8,8 +8,8 @@ namespace Fin.Api.Controllers;
 [Route("api/[controller]")]
 public class PaymentsController(
     CreatePaymentUseCase createPaymentUseCase,
-    UpdatePaymentUseCase updatePaymentUseCase,
-    DeletePaymentOrTransferUseCase deletePaymentOrTransferUseCase) : ControllerBase
+    EditPaymentUseCase editPaymentUseCase,
+    DeletePaymentOrRelatedTransferIfAnyUseCase deletePaymentOrRelatedTransferIfAnyUseCase) : ControllerBase
 {
     [HttpPost]
     [Authorize]
@@ -20,10 +20,10 @@ public class PaymentsController(
 
     [HttpPut("{id:int:min(1)}")]
     [Authorize]
-    public IActionResult Update([FromRoute] int id, [FromBody] UpdatePaymentRequest request)
+    public IActionResult Update([FromRoute] int id, [FromBody] EditPaymentRequest request)
     {
         request.Id = id;
-        updatePaymentUseCase.Handle(request);
+        editPaymentUseCase.Handle(request);
         return Ok();
     }
 
@@ -31,7 +31,7 @@ public class PaymentsController(
     [Authorize]
     public IActionResult Delete([FromRoute] int id)
     {
-        deletePaymentOrTransferUseCase.Handle(id);
+        deletePaymentOrRelatedTransferIfAnyUseCase.Handle(id);
         return NoContent();
     }
 }

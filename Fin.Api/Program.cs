@@ -41,17 +41,18 @@ public class Program
         builder.Services.AddScoped<ConfigService>();
         builder.Services.AddScoped<CreatePaymentUseCase>();
         builder.Services.AddScoped<CreateTransferUseCase>();
-        builder.Services.AddScoped<DeletePaymentOrTransferUseCase>();
+        builder.Services.AddScoped<DeletePaymentOrRelatedTransferIfAnyUseCase>();
         builder.Services.AddScoped<DeleteTransferUseCase>();
-        builder.Services.AddScoped<GetAccountsUseCase>();
+        builder.Services.AddScoped<GetAllAccountsUseCase>();
+        builder.Services.AddScoped<GetAllConfigsUseCase>();
         builder.Services.AddScoped<GetBanksUseCase>();
         builder.Services.AddScoped<GetMonthUseCase>();
         builder.Services.AddScoped<LoginUseCase>();
         builder.Services.AddScoped<RecurrenceService>();
         builder.Services.AddScoped<RefreshTokenUseCase>();
         builder.Services.AddScoped<UpdateConfigUseCase>();
-        builder.Services.AddScoped<UpdatePaymentUseCase>();
-        builder.Services.AddScoped<UpdateTransferUseCase>();
+        builder.Services.AddScoped<EditPaymentUseCase>();
+        builder.Services.AddScoped<EditTransferUseCase>();
         builder.Services.AddScoped<UserService>();
     }
 

@@ -8,7 +8,7 @@ namespace Fin.Api.Controllers;
 [Route("api/[controller]")]
 public class TransfersController(
     CreateTransferUseCase createTransferUseCase,
-    UpdateTransferUseCase updateTransferUseCase,
+    EditTransferUseCase editTransferUseCase,
     DeleteTransferUseCase deleteTransferUseCase) : ControllerBase
 {
     [HttpPost]
@@ -21,10 +21,10 @@ public class TransfersController(
 
     [HttpPut("{id:int:min(1)}")]
     [Authorize]
-    public IActionResult Update([FromRoute] int id, [FromBody] UpdateTransferRequest request)
+    public IActionResult Edit([FromRoute] int id, [FromBody] EditTransferRequest request)
     {
         request.Id = id;
-        updateTransferUseCase.Handle(request);
+        editTransferUseCase.Handle(request);
         return Ok();
     }
 

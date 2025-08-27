@@ -6,13 +6,13 @@ namespace Fin.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountsController(GetAccountsUseCase getAccountsUseCase) : ControllerBase
+public class AccountsController(GetAllAccountsUseCase getAllAllAccountsUseCase) : ControllerBase
 {
     [HttpGet]
     [Authorize]
     public IActionResult GetAll()
     {
-        var response = getAccountsUseCase.Handle();
+        var response = getAllAllAccountsUseCase.Handle();
         return Ok(response);
     }
 }

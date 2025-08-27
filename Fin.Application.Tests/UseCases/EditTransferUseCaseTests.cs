@@ -7,7 +7,7 @@ using Moq;
 
 namespace Fin.Application.Tests.UseCases;
 
-public class UpdateTransferUseCaseTests
+public class EditTransferUseCaseTests
 {
     private Mock<IPaymentRepository> _paymentRepositoryMock;
     private Mock<ITransferRepository> _transferRepositoryMock;
@@ -15,7 +15,7 @@ public class UpdateTransferUseCaseTests
     
     private Mock<IDbContextTransaction> _dbContextTransactionMock;
     
-    private UpdateTransferUseCase _sut;
+    private EditTransferUseCase _sut;
     
     [SetUp]
     public void Setup()
@@ -29,14 +29,14 @@ public class UpdateTransferUseCaseTests
             .Setup(uow => uow.BeginTransaction())
             .Returns(_dbContextTransactionMock.Object);
         
-        _sut = new UpdateTransferUseCase(
+        _sut = new EditTransferUseCase(
             _paymentRepositoryMock.Object,
             _transferRepositoryMock.Object,
             _unitOfWorkMock.Object);
     }
     
     [Test]
-    public void GivenValidTransfer_WhenUpdate_ShouldUpdateTransfer()
+    public void GivenValidTransfer_WhenUpdate_ShouldEditTransfer()
     {
         // Arrange
         var paymentFrom = new Payment
@@ -73,7 +73,7 @@ public class UpdateTransferUseCaseTests
             .Setup(x => x.Get(1002))
             .Returns(paymentTo);
         
-        var request = new UpdateTransferRequest
+        var request = new EditTransferRequest
         {
             Id = 5001,
             PaymentId = 1001,

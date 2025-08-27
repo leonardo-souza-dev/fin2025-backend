@@ -3,12 +3,12 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    public class UpdateTransferUseCase(
+    public class EditTransferUseCase(
         IPaymentRepository paymentRepository,
         ITransferRepository transferRepository,
         IUnitOfWork unitOfWork)
     {
-        public void Handle(UpdateTransferRequest request)
+        public void Handle(EditTransferRequest request)
         {
             var transfer = transferRepository.Get(request.Id);
             if (transfer == null)
@@ -58,7 +58,7 @@ namespace Fin.Application.UseCases
         }
     }
 
-    public class UpdateTransferRequest
+    public class EditTransferRequest
     {
         public required int Id { get; set; }
         public required int PaymentId { get; set; }

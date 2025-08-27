@@ -8,10 +8,10 @@ using Fin.Infrastructure.Data;
 
 namespace Fin.Api.IntegrationTests.Transfers;
 
-public class UpdateTransferUseCaseIntegrationTests : IntegrationTestBase
+public class EditTransferUseCaseIntegrationTests : IntegrationTestBase
 {
     [Test]
-    public async Task GivenATransfer_WhenUpdateTransfer_ThenShouldUpdateTransfer()
+    public async Task GivenAValidTransfer_WhenEditTransfer_ThenShouldEditTransfer()
     {
         // Arrange
         _ = await LoginAndSetAccessTokenAsync();
@@ -26,7 +26,7 @@ public class UpdateTransferUseCaseIntegrationTests : IntegrationTestBase
         var toAccount = await dbContext.Accounts.Skip(1).FirstAsync();
 
         // Act & Assert
-        var putResponse = await Client.PutAsJsonAsync($"/api/transfers/{transfer.Id}", new UpdateTransferRequest
+        var putResponse = await Client.PutAsJsonAsync($"/api/transfers/{transfer.Id}", new EditTransferRequest
         {
             Id = transfer.Id,
             PaymentId = payment.Id,

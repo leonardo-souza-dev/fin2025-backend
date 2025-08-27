@@ -3,7 +3,7 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases;
 
-public class DeletePaymentOrTransferUseCase(
+public class DeletePaymentOrRelatedTransferIfAnyUseCase(
     IPaymentRepository paymentRepository,
     ITransferRepository transferRepository,
     IUnitOfWork unitOfWork)

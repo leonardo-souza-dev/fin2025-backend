@@ -3,9 +3,9 @@ using Fin.Infrastructure.Repositories;
 
 namespace Fin.Application.UseCases
 {
-    public class UpdatePaymentUseCase(IPaymentRepository paymentRepository, IUnitOfWork unitOfWork)
+    public class EditPaymentUseCase(IPaymentRepository paymentRepository, IUnitOfWork unitOfWork)
     {
-        public void Handle(UpdatePaymentRequest request)
+        public void Handle(EditPaymentRequest request)
         {
             var payment = paymentRepository.Get(request.Id);
 
@@ -23,12 +23,12 @@ namespace Fin.Application.UseCases
         }
     }
 
-    public class UpdatePaymentRequest
+    public class EditPaymentRequest
     {
-        public int Id { get; set; }
-        public DateOnly Date { get; set; }
-        public string Description { get; set; }
-        public int FromAccountId { get; set; }
-        public decimal Amount { get; set; }
+        public required int Id { get; set; }
+        public required DateOnly Date { get; set; }
+        public required string Description { get; set; }
+        public required int FromAccountId { get; set; }
+        public required decimal Amount { get; set; }
     }
 }

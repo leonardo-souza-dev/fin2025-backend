@@ -9,11 +9,15 @@ namespace Fin.Api.Controllers;
 [Route("api/[controller]")]
 public class ConfigsController(
     ConfigService service,
+    GetAllConfigsUseCase getAllConfigsUseCase,
     UpdateConfigUseCase updateConfigUseCase) : ControllerBase
 {
     [HttpGet]
     [Authorize]
-    public IActionResult GetAll() => Ok(service.GetAll());
+    public IActionResult GetAll()
+    {
+        return Ok(getAllConfigsUseCase.Handle());
+    }
 
     [HttpPost]
     [Authorize]
