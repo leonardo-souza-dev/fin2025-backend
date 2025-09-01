@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Authentication;
 using Fin.Domain.Exceptions;
 
 namespace Fin.Api;
@@ -22,7 +23,8 @@ public class ErrorHandlingMiddleware(RequestDelegate next)
         var code = exception switch
         {
             ArgumentNullException => HttpStatusCode.BadRequest,
-            UserNotFoundException => HttpStatusCode.NotFound,
+            UserNotFoundException => HttpStatusCode.Unauthorized,
+            AuthenticationException => HttpStatusCode.Unauthorized,
             _ => HttpStatusCode.InternalServerError
         };
         

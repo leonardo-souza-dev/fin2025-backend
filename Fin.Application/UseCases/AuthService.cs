@@ -18,7 +18,7 @@ namespace Fin.Application.UseCases
     {
         private const string FIN2025_JWT_SECRET_KEY = "FIN2025_JWT_SECRET_KEY";
 
-        private string GetSecretKey()
+        private static string GetSecretKey()
         {
             var secretKey = Environment.GetEnvironmentVariable(FIN2025_JWT_SECRET_KEY);
 

@@ -1,11 +1,12 @@
-﻿using Fin.Domain.Entities;
+﻿using System.Linq.Expressions;
+using Fin.Domain.Entities;
 using Fin.Infrastructure.Data;
 
 namespace Fin.Infrastructure.Repositories
 {
     public interface IConfigRepository
     {
-        IEnumerable<Config> GetAll();
+        IQueryable<Config> GetAll(Expression<Func<Config, bool>>? predicate = null);
         Config? Get(int id);
         void Create(Config config);
         void Update(Config config);
@@ -13,9 +14,13 @@ namespace Fin.Infrastructure.Repositories
 
     public class ConfigRepository(FinDbContext context) : IConfigRepository
     {
-        public IEnumerable<Config> GetAll()
+        public IQueryable<Config> GetAll(Expression<Func<Config, bool>>? predicate = null)
         {
-            return context.Configs.Where(a => a.IsActive);
+            predicate ??= (_ => true);
+            
+            return context.Configs
+                .Where(c => c.IsActive)
+                .Where(predicate).AsQueryable();
         }
 
         public Config? Get(int id)

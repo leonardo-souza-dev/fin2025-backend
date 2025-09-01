@@ -34,6 +34,7 @@ namespace Fin.Application.UseCases
             {
                 var paymentFromCreated = paymentRepository.Create(paymentFrom);
                 var paymentToCreated = paymentRepository.Create(paymentTo);
+                unitOfWork.SaveChanges();
 
                 var transfer = new Transfer
                 {

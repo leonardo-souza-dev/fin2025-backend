@@ -1,3 +1,4 @@
+using System.Security.Authentication;
 using Fin.Domain.Exceptions;
 using Fin.Infrastructure.Repositories;
 using System.Security.Claims;
@@ -11,15 +12,7 @@ namespace Fin.Application.UseCases
         
         public LoginResponse Handle(LoginRequest request, ref IResponseCookies cookies)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            if (request.Email == null)
-            {
-                throw new ArgumentNullException(nameof(request.Email));
-            }
+            ArgumentNullException.ThrowIfNull(request);
             
             var user = userRepository.GetUserByEmail(request.Email);
             if (user == null)
@@ -29,7 +22,8 @@ namespace Fin.Application.UseCases
             
             if (!PasswordHasher.VerifyPassword(request.Password, user.Password))
             {
-                throw new InvalidCredentials();
+                throw new AuthenticationException();
+
             }
 
             var claims = new List<Claim>

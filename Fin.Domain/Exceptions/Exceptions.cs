@@ -5,7 +5,7 @@ namespace Fin.Domain.Exceptions
         public override string Message => $"User with {param} {email} not found";
     }
 
-    public class InvalidCredentials : Exception
+    public class InvalidCredentialsException : Exception
     {
     }
 }
