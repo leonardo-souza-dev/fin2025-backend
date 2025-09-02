@@ -16,7 +16,8 @@ public class ConfigsController(
     [Authorize]
     public IActionResult GetAll()
     {
-        return Ok(getAllConfigsUseCase.Handle());
+        var response = getAllConfigsUseCase.Handle();
+        return Ok(response);
     }
 
     [HttpPost]

@@ -33,12 +33,6 @@ namespace Fin.Infrastructure.Repositories
                 .Where(t => t.IsActive);
             return entities;
         }
-
-        public Payment? FindAsync(int id)
-        {
-            var payment = context.Payments.Find(id);
-            return payment != null && payment.IsActive ? payment : null;
-        }
         
         public Payment? Get(int id)
         {

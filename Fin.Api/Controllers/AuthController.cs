@@ -1,6 +1,7 @@
 ﻿using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Fin.Api.DTO;
 using Fin.Application.UseCases;
 
 namespace Fin.Api.Controllers;
@@ -40,7 +41,7 @@ public class AuthController(
     }
 
     [HttpPost("register")]
-    public IActionResult Register([FromBody] DTO.RegisterRequest request)
+    public IActionResult Register([FromBody] RegisterRequest request)
     {
         try
         {
@@ -63,7 +64,7 @@ public class AuthController(
                 IsActive = true,
             };
 
-            userService.Upsert(newUser);
+            userService.Create(newUser);
 
             // 5. Gerar tokens (opcional)
             var claims = new List<Claim>

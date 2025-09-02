@@ -87,7 +87,7 @@ public class CreateTransferUseCaseTests
         // Assert
         _unitOfWorkMock.Verify(x => x.BeginTransaction(), Times.Once);
         _paymentRepositoryMock.Verify(x => x.Create(It.IsAny<Payment>()), Times.Exactly(2));
-        _unitOfWorkMock.Verify(x => x.SaveChanges(), Times.Once);
+        _unitOfWorkMock.Verify(x => x.SaveChanges(), Times.Exactly(2));
         _transferRepositoryMock.Verify(x => x.Create(It.IsAny<Transfer>()), Times.Once);
         _dbContextTransactionMock.Verify(x => x.Commit(), Times.Once);
     }

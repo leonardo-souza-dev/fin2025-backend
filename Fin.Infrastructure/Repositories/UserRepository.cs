@@ -7,7 +7,7 @@ public interface IUserRepository
 {
     User? GetUserByEmail(string email);
     User? Get(int id);
-    void Upsert(User user);
+    User Create(User user);
 }
 
 public class UserRepository(FinDbContext context) : IUserRepository
@@ -24,20 +24,14 @@ public class UserRepository(FinDbContext context) : IUserRepository
         return user != null && user.IsActive ? user : null;;
     }
 
-    public void Upsert(User user)
+    public User Create(User user)
     {
-        var existingUser = GetUserByEmail(user.Email);
+        ArgumentNullException.ThrowIfNull(user);
 
-        if (existingUser != null)
-        {
-            existingUser.Email = user.Email;
-            existingUser.IsActive = user.IsActive;
-            existingUser.Role = user.Role;
-            context.Users.Update(existingUser);
-        }
-        else
-        {
-            context.Users.Add(user);
-        }
+        user.IsActive = true;
+        
+        context.Users.Add(user);
+        
+        return user;
     }
 }

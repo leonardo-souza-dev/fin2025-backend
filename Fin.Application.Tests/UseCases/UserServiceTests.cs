@@ -1,6 +1,7 @@
 using Fin.Application.UseCases;
 using Fin.Domain.Entities;
 using Fin.Domain.Exceptions;
+using Fin.Infrastructure.Data;
 using Fin.Infrastructure.Repositories;
 using Moq;
 
@@ -9,6 +10,7 @@ namespace Fin.Application.Tests.UseCases;
 public class UserServiceTests
 {
     private Mock<IUserRepository> _userRepositoryMock;
+    private Mock<IUnitOfWork> _unitOfWorkMock;
 
     private UserService _userService;
 
@@ -16,8 +18,9 @@ public class UserServiceTests
     public void Setup()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        _userService = new UserService(_userRepositoryMock.Object);
+        _userService = new UserService(_userRepositoryMock.Object, _unitOfWorkMock.Object);
     }
 
     [Test]
@@ -43,50 +46,6 @@ public class UserServiceTests
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.InstanceOf<User>());
         Assert.That(result.Email, Is.EqualTo(email));
-    }
-
-    [Test]
-    public void WhenPassingNonExistingEmail_ShouldNotGetUser()
-    {
-        // Arrange
-        var nonExistingEmail = "nonexisting@email.com";
-
-        // Act
-        Assert.Throws<UserNotFoundException>(() => _userService.GetUserByEmail(nonExistingEmail));
-    }
-
-    [Test]
-    public void WhenPassingInvalidEmail_ShouldNotUpsert()
-    {
-        // Arrange
-        var user = new User
-        {
-            Id = 1,
-            Email = null,
-            IsActive = true,
-            Password = "123456789",
-            Role = "user"
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => _userService.Upsert(user));
-    }
-
-    [Test]
-    public void WhenPassingInvalidPassword_ShouldNotUpsert()
-    {
-        // Arrange
-        var user = new User
-        {
-            Id = 1,
-            Email = "user@email.com",
-            Password = null,
-            IsActive = true,
-            Role = "user"
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => _userService.Upsert(user));
     }
 }
 

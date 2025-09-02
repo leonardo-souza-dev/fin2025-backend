@@ -84,8 +84,17 @@ public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Progra
         if (dbContext.Users.Any())
             return;
 
+        var config = new Config
+        {
+            Key = "foo",
+            Value = "bar",
+            IsActive = true
+        };
+        dbContext.Configs.Add(config);
+        dbContext.SaveChanges();
+
         // Add test user
-        var user = new Fin.Domain.Entities.User
+        var user = new User
         {
             Email = "user@email.com",
             Password = "$2a$13$PsfhXFM6RKlHoNl6Il3MJuTOoaMj.yBEQOyDpjNIy0ZjKgQYp/L/e", // 12345678 hashed
@@ -126,7 +135,7 @@ public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Progra
             };
             dbContext.Payments.Add(paymentFrom);
 
-            var paymentTo = new Fin.Domain.Entities.Payment
+            var paymentTo = new Payment
             {
                 Date = new DateOnly(2025, 8, 23),
                 Description = "transfer87",
@@ -139,7 +148,7 @@ public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Progra
             dbContext.SaveChanges(); // Save to get payment IDs
 
             // Add test transfer linking the payments
-            var transfer = new Fin.Domain.Entities.Transfer
+            var transfer = new Transfer
             {
                 PaymentFromId = paymentFrom.Id,
                 PaymentToId = paymentTo.Id,
