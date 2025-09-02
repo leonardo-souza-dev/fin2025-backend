@@ -4,7 +4,7 @@ using System.Security.Claims;
 using Fin.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 
-namespace Fin.Application.UseCases
+namespace Fin.Application.UseCases.Auth
 {
     public class RefreshTokenUseCase(IAuthService authService, IUserRepository userRepository)
     {

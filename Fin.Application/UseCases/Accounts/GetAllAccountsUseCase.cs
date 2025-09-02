@@ -2,7 +2,7 @@ using System.Collections;
 using Fin.Domain.Entities;
 using Fin.Infrastructure.Repositories;
 
-namespace Fin.Application.UseCases
+namespace Fin.Application.UseCases.Accounts
 {
     public class GetAllAccountsUseCase(IAccountRepository accountRepository)
     {

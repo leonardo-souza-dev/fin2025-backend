@@ -4,7 +4,7 @@ using Fin.Infrastructure.Repositories;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
-namespace Fin.Application.UseCases
+namespace Fin.Application.UseCases.Auth
 {
     public class LoginUseCase(IUserRepository userRepository, IAuthService authService)
     {

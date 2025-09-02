@@ -1,7 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using Fin.Api.IntegrationTests.Base;
-using Fin.Application.UseCases;
+using Fin.Application.UseCases.Months;
+using Fin.Application.UseCases.Payments;
 using Microsoft.Extensions.DependencyInjection;
 using Fin.Infrastructure.Data;
 

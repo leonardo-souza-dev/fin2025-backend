@@ -1,7 +1,7 @@
 using Fin.Infrastructure.Data;
 using Fin.Infrastructure.Repositories;
 
-namespace Fin.Application.UseCases
+namespace Fin.Application.UseCases.Payments
 {
     public class EditPaymentUseCase(IPaymentRepository paymentRepository, IUnitOfWork unitOfWork)
     {

@@ -2,7 +2,7 @@ using System.Collections;
 using Fin.Domain.Entities;
 using Fin.Infrastructure.Repositories;
 
-namespace Fin.Application.UseCases
+namespace Fin.Application.UseCases.Banks
 {
     public class GetBanksUseCase(IBankRepository bankRepository)
     {

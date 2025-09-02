@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Fin.Application.UseCases;
+using Fin.Application.UseCases.Auth;
 
 namespace Fin.Api.IntegrationTests.Base;
 

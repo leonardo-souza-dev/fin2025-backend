@@ -12,7 +12,7 @@ public class UserServiceTests
     private Mock<IUserRepository> _userRepositoryMock;
     private Mock<IUnitOfWork> _unitOfWorkMock;
 
-    private UserService _userService;
+    private UserService _sut;
 
     [SetUp]
     public void Setup()
@@ -20,7 +20,7 @@ public class UserServiceTests
         _userRepositoryMock = new Mock<IUserRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        _userService = new UserService(_userRepositoryMock.Object, _unitOfWorkMock.Object);
+        _sut = new UserService(_userRepositoryMock.Object, _unitOfWorkMock.Object);
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class UserServiceTests
             .Returns(users.FirstOrDefault(u => u.Email == email));
 
         // Act
-        var result = _userService.GetUserByEmail(email);
+        var result = _sut.GetUserByEmail(email);
 
         // Assert
         Assert.That(result, Is.Not.Null);

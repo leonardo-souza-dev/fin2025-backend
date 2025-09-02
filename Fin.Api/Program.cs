@@ -5,6 +5,13 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
 using Fin.Application.UseCases;
+using Fin.Application.UseCases.Accounts;
+using Fin.Application.UseCases.Auth;
+using Fin.Application.UseCases.Banks;
+using Fin.Application.UseCases.Configs;
+using Fin.Application.UseCases.Months;
+using Fin.Application.UseCases.Payments;
+using Fin.Application.UseCases.Transfers;
 using Fin.Infrastructure.Data;
 using Fin.Infrastructure.Repositories;
 

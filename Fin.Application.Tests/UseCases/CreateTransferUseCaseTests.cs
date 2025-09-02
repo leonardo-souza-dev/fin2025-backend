@@ -1,5 +1,6 @@
 using Fin.Domain.Entities;
 using Fin.Application.UseCases;
+using Fin.Application.UseCases.Transfers;
 using Fin.Infrastructure.Data;
 using Fin.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;

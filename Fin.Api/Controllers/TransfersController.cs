@@ -1,4 +1,4 @@
-using Fin.Application.UseCases;
+using Fin.Application.UseCases.Transfers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

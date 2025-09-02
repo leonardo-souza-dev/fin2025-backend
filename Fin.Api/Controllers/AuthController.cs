@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Fin.Api.DTO;
 using Fin.Application.UseCases;
+using Fin.Application.UseCases.Auth;
 
 namespace Fin.Api.Controllers;
 
