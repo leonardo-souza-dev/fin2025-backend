@@ -59,6 +59,7 @@ public class Program
         // banks
         builder.Services.AddScoped<GetBanksUseCase>();
         // configs
+        builder.Services.AddScoped<CreateConfigUseCase>();
         builder.Services.AddScoped<GetAllConfigsUseCase>();
         builder.Services.AddScoped<UpdateConfigUseCase>();
         // months

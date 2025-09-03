@@ -8,14 +8,14 @@ namespace Fin.Application.UseCases.Configs
     {
         public GetAllConfigsResponse Handle() =>
             GetAllConfigsResponse.Of(repository.GetAll());
+    }
 
-        public class GetAllConfigsResponse(IEnumerable<Config> configs) : IEnumerable<Config>
-        {
-            public IEnumerator<Config> GetEnumerator() => configs.GetEnumerator();
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public class GetAllConfigsResponse(IEnumerable<Config> configs) : IEnumerable<Config>
+    {
+        public IEnumerator<Config> GetEnumerator() => configs.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            public static GetAllConfigsResponse Of(IQueryable<Config> configs) =>
-                new(configs);
-        }
+        public static GetAllConfigsResponse Of(IQueryable<Config> configs) =>
+            new(configs);
     }
 }

@@ -9,8 +9,8 @@ namespace Fin.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class ConfigsController(
-    ConfigService service,
     GetAllConfigsUseCase getAllConfigsUseCase,
+    CreateConfigUseCase createConfigUseCase,
     UpdateConfigUseCase updateConfigUseCase) : ControllerBase
 {
     [HttpGet]
@@ -23,23 +23,10 @@ public class ConfigsController(
 
     [HttpPost]
     [Authorize]
-    public IActionResult Create([FromBody] Config config)
+    public IActionResult Create([FromBody] CreateConfigRequest request)
     {
-        if (config == null || config.Id.HasValue)
-        {
-            return BadRequest("Config cannot be null or some ID was found.");
-        }
-
-        try
-        {
-            service.Create(config);
-        }
-        catch(InvalidOperationException ex)
-        {
-            return BadRequest(ex);
-        }
-
-        return CreatedAtAction(nameof(Create), config);
+        var response = createConfigUseCase.Handle(request);
+        return CreatedAtAction(nameof(Create), response);
     }
 
     [HttpPut("{id:int:min(1)}")]

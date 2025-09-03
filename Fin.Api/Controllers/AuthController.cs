@@ -41,7 +41,7 @@ public class AuthController(
         var cookies = Response.Cookies;
         var response = registerUseCase.Handle(request, ref cookies);
 
-        return Created("/", response);
+        return CreatedAtAction(nameof(Register), response);
     }
 
     [HttpDelete("logout")]

@@ -7,7 +7,7 @@ public class Config
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int? Id { get; set; }
+    public int Id { get; set; }
     public required string Key { get; set; }
     public required string Value { get; set; }
     public bool IsActive { get; set; }
