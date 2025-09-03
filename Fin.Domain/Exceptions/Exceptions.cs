@@ -8,4 +8,9 @@ namespace Fin.Domain.Exceptions
     public class InvalidCredentialsException : Exception
     {
     }
+
+    public class UserAlreadExistsException(string param, string email) : Exception
+    {
+        public override string Message => $"User with {param} {email} already exists";
+    }
 }

@@ -1,6 +1,7 @@
 using System.Security.Authentication;
 using Fin.Domain.Exceptions;
 using System.Security.Claims;
+using Fin.Application.Services;
 using Fin.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 

@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
+using Fin.Application.Services;
 using Fin.Application.UseCases;
 using Fin.Application.UseCases.Accounts;
 using Fin.Application.UseCases.Auth;
@@ -44,20 +45,30 @@ public class Program
         
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+        // services
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ConfigService>();
+        
+        // use cases
+        // accounts
+        builder.Services.AddScoped<GetAllAccountsUseCase>();
+        // auth
+        builder.Services.AddScoped<LoginUseCase>();
+        builder.Services.AddScoped<RefreshTokenUseCase>();
+        builder.Services.AddScoped<RegisterUseCase>();
+        // banks
+        builder.Services.AddScoped<GetBanksUseCase>();
+        // configs
+        builder.Services.AddScoped<GetAllConfigsUseCase>();
+        builder.Services.AddScoped<UpdateConfigUseCase>();
+        // months
+        builder.Services.AddScoped<GetMonthUseCase>();
+        // payments
         builder.Services.AddScoped<CreatePaymentUseCase>();
         builder.Services.AddScoped<CreateTransferUseCase>();
         builder.Services.AddScoped<DeletePaymentOrRelatedTransferIfAnyUseCase>();
         builder.Services.AddScoped<DeleteTransferUseCase>();
-        builder.Services.AddScoped<GetAllAccountsUseCase>();
-        builder.Services.AddScoped<GetAllConfigsUseCase>();
-        builder.Services.AddScoped<GetBanksUseCase>();
-        builder.Services.AddScoped<GetMonthUseCase>();
-        builder.Services.AddScoped<LoginUseCase>();
         builder.Services.AddScoped<RecurrenceService>();
-        builder.Services.AddScoped<RefreshTokenUseCase>();
-        builder.Services.AddScoped<UpdateConfigUseCase>();
         builder.Services.AddScoped<EditPaymentUseCase>();
         builder.Services.AddScoped<EditTransferUseCase>();
         builder.Services.AddScoped<UserService>();

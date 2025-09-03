@@ -25,6 +25,7 @@ public class ErrorHandlingMiddleware(RequestDelegate next)
             ArgumentNullException => HttpStatusCode.BadRequest,
             UserNotFoundException => HttpStatusCode.Unauthorized,
             AuthenticationException => HttpStatusCode.Unauthorized,
+            UserAlreadExistsException => HttpStatusCode.Forbidden,
             _ => HttpStatusCode.InternalServerError
         };
         

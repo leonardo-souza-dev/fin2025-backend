@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
-namespace Fin.Application.UseCases
+namespace Fin.Application.Services
 {
     public interface IAuthService
     {

@@ -2,6 +2,7 @@ using System.Security.Authentication;
 using Fin.Domain.Exceptions;
 using Fin.Infrastructure.Repositories;
 using System.Security.Claims;
+using Fin.Application.Services;
 using Microsoft.AspNetCore.Http;
 
 namespace Fin.Application.UseCases.Auth
