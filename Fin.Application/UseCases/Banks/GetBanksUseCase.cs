@@ -9,10 +9,7 @@ namespace Fin.Application.UseCases.Banks
         public GetBanksResponse Handle()
         {
             var banksQuery = bankRepository.GetAll();
-            var banks = banksQuery.ToList();
-            var response = new GetBanksResponse(banks);
-
-            return response;
+            return GetBanksResponse.Of(banksQuery);
         }
     }
 
@@ -26,6 +23,11 @@ namespace Fin.Application.UseCases.Banks
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public static GetBanksResponse Of(IQueryable<Bank> banks)
+        {
+            return new GetBanksResponse(banks);
         }
     }
 }

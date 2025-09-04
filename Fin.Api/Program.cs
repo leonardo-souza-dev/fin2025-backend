@@ -4,9 +4,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
+using Fin.Api.Infrastructure;
 using Fin.Application.Services;
 using Fin.Application.UseCases;
-using Fin.Application.UseCases.Accounts;
+using Fin.Application.UseCases.BankAccounts;
 using Fin.Application.UseCases.Auth;
 using Fin.Application.UseCases.Banks;
 using Fin.Application.UseCases.Configs;
@@ -30,7 +31,7 @@ public class Program
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException(
-                "String de conexão não configurada. Configure a variável de ambiente FIN2025_DATABASE_CONNECTION ou a configuração DefaultConnection.");            
+                "String de conexão não configurada. Configure a variável de ambiente FIN2025_DATABASE_CONNECTION ou a configuração DefaultConnection.");
         }
 
         builder.Services.AddDbContext<FinDbContext>(options => options.UseNpgsql(connectionString), ServiceLifetime.Scoped);
@@ -42,15 +43,16 @@ public class Program
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         builder.Services.AddScoped<ITransferRepository, TransferRepository>();
         builder.Services.AddScoped<IRecurrenceRepository, RecurrenceRepository>();
-        
+
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         // services
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ConfigService>();
-        
+
         // use cases
-        // accounts
+        // bankAccounts
+        builder.Services.AddScoped<GetAllBankAccountsUseCase>();
         builder.Services.AddScoped<GetAllAccountsUseCase>();
         // auth
         builder.Services.AddScoped<LoginUseCase>();
@@ -73,6 +75,16 @@ public class Program
         builder.Services.AddScoped<EditPaymentUseCase>();
         builder.Services.AddScoped<EditTransferUseCase>();
         builder.Services.AddScoped<UserService>();
+        
+        builder.Services.Configure<RouteOptions>(options =>
+        {
+            options.LowercaseUrls = true;
+        });
+        builder.Services.AddControllers(options =>
+        {
+            options.Conventions.Add(new Microsoft.AspNetCore.Mvc.ApplicationModels.RouteTokenTransformerConvention(
+                new KebabCaseParameterTransformer()));
+        });
     }
 
     public static void Main(string[] args)

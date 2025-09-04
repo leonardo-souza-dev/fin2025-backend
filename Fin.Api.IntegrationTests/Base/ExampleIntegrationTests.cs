@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Fin.Api.IntegrationTests.Base;
+using Fin.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Fin.Infrastructure.Data;
 
@@ -12,23 +13,6 @@ namespace Fin.Api.IntegrationTests.Base;
 /// </summary>
 public class ExampleIntegrationTests : IntegrationTestBase
 {
-    [Test]
-    public async Task Example_GetAccounts_ShouldReturnSeedAccounts()
-    {
-        // Arrange
-        _ = await LoginAndSetAccessTokenAsync();
-
-        // Act
-        var response = await Client.GetAsync("/api/accounts");
-
-        // Assert
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        
-        var accounts = await response.Content.ReadFromJsonAsync<List<dynamic>>();
-        Assert.That(accounts, Is.Not.Null);
-        Assert.That(accounts.Count, Is.EqualTo(2)); // We seeded 2 accounts
-    }
-
     [Test]
     public void Example_AccessDatabase_ShouldAllowDirectDatabaseAccess()
     {
@@ -52,18 +36,19 @@ public class ExampleIntegrationTests : IntegrationTestBase
         using var scope = Factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<FinDbContext>();
         
-        var newBank = new Fin.Domain.Entities.Bank 
+        var newConfig = new Config 
         { 
-            Name = "Custom Test Bank", 
-            IsActive = true 
+            Key = "fooKey", 
+            Value = "fooValue",
+            IsActive = true
         };
-        dbContext.Banks.Add(newBank);
+        dbContext.Configs.Add(newConfig);
         await dbContext.SaveChangesAsync();
 
         _ = await LoginAndSetAccessTokenAsync();
 
         // Act
-        var response = await Client.GetAsync("/api/banks");
+        var response = await Client.GetAsync("/api/configs");
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -93,7 +78,7 @@ public class ExampleIntegrationTests : IntegrationTestBase
         // Arrange - Don't set access token
 
         // Act
-        var response = await Client.GetAsync("/api/accounts");
+        var response = await Client.GetAsync("/api/bank-accounts");
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));

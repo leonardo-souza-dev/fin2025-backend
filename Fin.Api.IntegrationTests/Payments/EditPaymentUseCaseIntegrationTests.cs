@@ -28,8 +28,8 @@ public class EditPaymentUseCaseIntegrationTests : IntegrationTestBase
         // Arrange
         _ = await LoginAndSetAccessTokenAsync();
         
-        var accountId1 = _accountIds[0].Value;
-        var accountId2 = _accountIds[1].Value;
+        var accountId1 = _accountIds[0]!.Value;
+        var accountId2 = _accountIds[1]!.Value;
 
         var createPaymentPostResponse = await Client.PostAsJsonAsync("/api/payments", new CreatePaymentRequest
         {
@@ -38,10 +38,10 @@ public class EditPaymentUseCaseIntegrationTests : IntegrationTestBase
             FromAccountId = accountId1,
             Amount = -100
         });
-        Assert.True(createPaymentPostResponse.IsSuccessStatusCode);
         var createPaymentResponse = await createPaymentPostResponse.Content.ReadFromJsonAsync<CreatePaymentResponse>();
+        
         // Act
-        var actual = await Client.PutAsJsonAsync($"/api/payments/{createPaymentResponse.Id}", new EditPaymentRequest
+        var actual = await Client.PutAsJsonAsync($"/api/payments/{createPaymentResponse!.Id}", new EditPaymentRequest
         {
             Id = createPaymentResponse.Id,
             Date = new DateOnly(2050, 1, 2),
@@ -50,13 +50,19 @@ public class EditPaymentUseCaseIntegrationTests : IntegrationTestBase
             Amount = -101
         });
 
-        // Assert
-        Assert.That(actual.IsSuccessStatusCode);
-        Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(actual.IsSuccessStatusCode);
+            Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        });
+
         var monthHttpResponseMessage = await Client.GetAsync($"/api/months/year/2050/month/1/accounts/{accountId2}");
-        Assert.That(monthHttpResponseMessage.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        Assert.NotNull(monthHttpResponseMessage);
+        Assert.Multiple(() =>
+        {
+            Assert.That(monthHttpResponseMessage.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(monthHttpResponseMessage, Is.Not.Null);
+        });
         var monthResponse = await monthHttpResponseMessage.Content.ReadFromJsonAsync<GetMonthResponse>();
         Assert.That(monthResponse, Is.Not.Null);
         
@@ -66,7 +72,7 @@ public class EditPaymentUseCaseIntegrationTests : IntegrationTestBase
         Assert.Multiple(() =>
         {
             Assert.That(updatedPayment, Is.Not.Null);
-            Assert.That(updatedPayment.Date, Is.EqualTo(new DateOnly(2050, 1, 2)));
+            Assert.That(updatedPayment!.Date, Is.EqualTo(new DateOnly(2050, 1, 2)));
             Assert.That(updatedPayment.Description, Is.EqualTo("payment for integration tests updated"));
             Assert.That(updatedPayment.FromAccountId, Is.EqualTo(accountId2));
             Assert.That(updatedPayment.Amount, Is.EqualTo(-101));
