@@ -11,16 +11,18 @@ public class TransfersController(
     EditTransferUseCase editTransferUseCase,
     DeleteTransferUseCase deleteTransferUseCase) : ControllerBase
 {
-    [HttpPost]
     [Authorize]
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public IActionResult Create([FromBody] CreateTransferRequest request)
     {
         var response = createTransferUseCase.Handle(request);
         return CreatedAtAction(nameof(Create), response);
     }
 
-    [HttpPut("{id:int:min(1)}")]
     [Authorize]
+    [HttpPut("{id:int:min(1)}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Edit([FromRoute] int id, [FromBody] EditTransferRequest request)
     {
         request.Id = id;
@@ -28,8 +30,9 @@ public class TransfersController(
         return Ok();
     }
 
-    [HttpDelete("{id:int:min(1)}")]
     [Authorize]
+    [HttpDelete("{id:int:min(1)}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult Delete([FromRoute] int id)
     {
         deleteTransferUseCase.Handle(id);

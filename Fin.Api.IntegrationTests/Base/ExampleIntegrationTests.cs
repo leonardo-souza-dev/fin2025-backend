@@ -54,9 +54,9 @@ public class ExampleIntegrationTests : IntegrationTestBase
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         
         // Verify the new bank was created and is returned
-        var banks = await response.Content.ReadFromJsonAsync<List<dynamic>>();
-        Assert.That(banks, Is.Not.Null);
-        Assert.That(banks.Count, Is.EqualTo(3)); // 2 seeded + 1 custom
+        var configs = await response.Content.ReadFromJsonAsync<List<dynamic>>();
+        Assert.That(configs, Is.Not.Null);
+        Assert.That(configs.Count, Is.EqualTo(2)); // 1 seeded + 1 custom
     }
 
     [Test]
