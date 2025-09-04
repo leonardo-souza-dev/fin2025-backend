@@ -39,9 +39,12 @@ public class UpdateConfigUseCaseIntegrationTests : IntegrationTestBase
         });
 
         // Assert
-        Assert.That(actual.IsSuccessStatusCode);
-        Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        
+        Assert.Multiple(() =>
+        {
+            Assert.That(actual.IsSuccessStatusCode);
+            Assert.That(actual.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        });
+
         var getConfigsResponse = await Client.GetAsync($"/api/configs");
         Assert.That(getConfigsResponse, Is.Not.Null);
         Assert.That(getConfigsResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
