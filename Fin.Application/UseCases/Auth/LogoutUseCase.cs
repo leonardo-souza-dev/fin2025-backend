@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Http;
+using Fin.Application.Constants;
 
 namespace Fin.Application.UseCases.Auth
 {
     public class LogoutUseCase
     {
-        private const string REFRESH_TOKEN_KEY = "refreshToken"; //TODO: refactor
-        
         public LogoutResponse Handle(ref IResponseCookies responseCookies)
         {
-            responseCookies.Delete(REFRESH_TOKEN_KEY);
+            responseCookies.Delete(AuthConstants.RefreshTokenKey);
 
             return LogoutResponse.Of();
         }

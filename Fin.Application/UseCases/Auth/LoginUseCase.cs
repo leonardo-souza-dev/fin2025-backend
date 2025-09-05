@@ -2,6 +2,7 @@ using System.Security.Authentication;
 using Fin.Domain.Exceptions;
 using Fin.Infrastructure.Repositories;
 using System.Security.Claims;
+using Fin.Application.Constants;
 using Fin.Application.Services;
 using Microsoft.AspNetCore.Http;
 
@@ -9,8 +10,6 @@ namespace Fin.Application.UseCases.Auth
 {
     public class LoginUseCase(IUserRepository userRepository, IAuthService authService)
     {
-        private const string REFRESH_TOKEN_KEY = "refreshToken";
-        
         public LoginResponse Handle(LoginRequest request, ref IResponseCookies cookies)
         {
             ArgumentNullException.ThrowIfNull(request);
@@ -37,7 +36,7 @@ namespace Fin.Application.UseCases.Auth
             var accessToken = authService.GenerateAccessToken(claims);
             var refreshToken = authService.GenerateRefreshToken(user.Id);
 
-            cookies.Append(REFRESH_TOKEN_KEY, refreshToken, new CookieOptions
+            cookies.Append(AuthConstants.RefreshTokenKey, refreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
@@ -55,14 +54,14 @@ namespace Fin.Application.UseCases.Auth
 
     public sealed class LoginRequest
     {
-        public required string Email { get; set; }
-        public required string Password { get; set; }
+        public required string Email { get; init; }
+        public required string Password { get; init; }
     }
     
     public class LoginResponse
     {
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
+        public required string AccessToken { get; init; }
+        public required string RefreshToken { get; init; }
     }
     
     public static class PasswordHasher

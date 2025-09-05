@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Fin.Application.Constants;
 using Fin.Application.Services;
 using Fin.Domain.Entities;
 using Fin.Domain.Exceptions;
@@ -13,8 +14,6 @@ namespace Fin.Application.UseCases.Auth
         IUnitOfWork unitOfWork,
         IAuthService authService)
     {
-        private const string REFRESH_TOKEN_KEY = "refreshToken"; //TODO: centralizar essa chave
-        
         public RegisterResponse Handle(RegisterRequest request, ref IResponseCookies cookies)
         {
             if (repository.GetUserByEmail(request.Email) != null)
@@ -44,12 +43,12 @@ namespace Fin.Application.UseCases.Auth
             var accessToken = authService.GenerateAccessToken(claims);
             var refreshToken = authService.GenerateRefreshToken(newUser.Id);
             
-            cookies.Append(REFRESH_TOKEN_KEY, refreshToken, new CookieOptions
+            cookies.Append(AuthConstants.RefreshTokenKey, refreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                //Expires = _authService.GetRefreshTokenExpiry()
+                //Expires = _authService.GetRefreshTokenExpiry() //TODO: fix this
                 Path = "/"
             });
 

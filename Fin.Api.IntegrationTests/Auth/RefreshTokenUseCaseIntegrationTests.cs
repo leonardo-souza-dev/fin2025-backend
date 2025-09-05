@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using Fin.Api.IntegrationTests.Base;
+using Fin.Application.Constants;
 
 namespace Fin.Api.IntegrationTests.Auth;
 
@@ -14,7 +15,7 @@ public class RefreshTokenUseCaseIntegrationTests : IntegrationTestBase
 
         var httpRequestMessage = new HttpRequestMessage();
         httpRequestMessage.Method = HttpMethod.Post;
-        httpRequestMessage.Headers.Add("Cookie", $"refreshToken={accessToken}");
+        httpRequestMessage.Headers.Add("Cookie", $"{AuthConstants.RefreshTokenKey}={accessToken}");
         httpRequestMessage.RequestUri = new Uri(Client.BaseAddress!, "/api/auth/refresh");
         httpRequestMessage.Content = new StringContent("{\"AccessToken\":\"" + accessToken + "\"}", Encoding.UTF8, "application/json");
         
