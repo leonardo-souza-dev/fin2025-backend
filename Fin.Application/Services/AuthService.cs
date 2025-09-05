@@ -17,6 +17,7 @@ namespace Fin.Application.Services
     public class AuthService(IConfiguration configuration) : IAuthService
     {
         private const string FIN2025_JWT_SECRET_KEY = "FIN2025_JWT_SECRET_KEY";
+        private const string JWT_SETTINGS_KEY = "JwtSettings";
 
         private static string GetSecretKey()
         {
@@ -40,7 +41,7 @@ namespace Fin.Application.Services
 
         public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
+            var jwtSettings = GetJwtSettingsSection();
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GetSecretKey()));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
@@ -57,7 +58,7 @@ namespace Fin.Application.Services
 
         public string GenerateRefreshToken(int userId)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
+            var jwtSettings = GetJwtSettingsSection();
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GetSecretKey()));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var tokenOptions = new JwtSecurityToken(
@@ -75,7 +76,6 @@ namespace Fin.Application.Services
 
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false, // Pode ajustar conforme necessário
@@ -92,9 +92,14 @@ namespace Fin.Application.Services
 
         public DateTime GetRefreshTokenExpiry()
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
+            var jwtSettings = GetJwtSettingsSection();
             var refreshTokenExpiryInMinutes = Convert.ToDouble(jwtSettings["RefreshTokenExpiryInMinutes"]);
             return DateTime.UtcNow.AddMinutes(refreshTokenExpiryInMinutes);
+        }
+
+        private IConfigurationSection GetJwtSettingsSection()
+        {
+            return configuration.GetSection(JWT_SETTINGS_KEY);
         }
     }
 }

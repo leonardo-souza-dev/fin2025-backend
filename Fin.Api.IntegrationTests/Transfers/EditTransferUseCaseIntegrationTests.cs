@@ -41,8 +41,11 @@ public class EditTransferUseCaseIntegrationTests : IntegrationTestBase
         Assert.That(putResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         var httpResponseMessage = await Client.GetAsync($"/api/months/year/2025/month/8/accounts/{fromAccount.Id},{toAccount.Id}");
-        Assert.That(httpResponseMessage.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        Assert.That(httpResponseMessage, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(httpResponseMessage.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(httpResponseMessage, Is.Not.Null);
+        });
         var monthResponse = await httpResponseMessage.Content.ReadFromJsonAsync<GetMonthResponse>();
         Assert.That(monthResponse, Is.Not.Null);
 
