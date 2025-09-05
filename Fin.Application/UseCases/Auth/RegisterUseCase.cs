@@ -68,6 +68,6 @@ namespace Fin.Application.UseCases.Auth
 
     public class RegisterResponse
     {
-        public required string Message { get; set; }
+        public required string Message { get; init; }
     }
 }

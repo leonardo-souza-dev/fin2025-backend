@@ -36,8 +36,8 @@ namespace Fin.Application.UseCases.Months
 
     public class GetMonthResponse
     {
-        public decimal FinalBalancePreviousMonth { get; set; }
-        public List<DayPaymentsDto> DayPayments { get; set; } = [];
+        public decimal FinalBalancePreviousMonth { get; init; }
+        public List<DayPaymentsDto> DayPayments { get; init; } = [];
 
         public GetMonthResponse(Month month)
         {
@@ -55,8 +55,8 @@ namespace Fin.Application.UseCases.Months
 
     public class DayPaymentsDto
     {
-        public DateOnly Day { get; set; }
-        public List<PaymentDto> Payments { get; set; } = [];
+        public DateOnly Day { get; private set; }
+        public List<PaymentDto> Payments { get; } = [];
         public decimal FinalBalance { get; set; }
 
         public DayPaymentsDto(DayPayments dayPayments)

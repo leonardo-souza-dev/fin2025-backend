@@ -19,25 +19,4 @@ public class Payment
     
     [NotMapped]
     public int? PaymentIdTransferRelated { get; set; }
-    
-    public string GetPaymentType() => ToAccountId != null ? "TRANSFER" : "SIMPLE";
-    public bool IsRecurrent() => RecurrenceId != null;
-
-    public Payment CreateRelatedTransfer()
-    {
-        if (this.GetPaymentType() != "TRANSFER")
-        {
-            throw new InvalidOperationException("Cannot invert accounts for a non-transfer payment.");
-        }
-        return new Payment
-        {
-            Date = Date,
-            Description = Description,
-            FromAccountId = ToAccountId!.Value,
-            Amount = Amount * -1,
-            ToAccountId = FromAccountId,
-            RecurrenceId = RecurrenceId,
-            IsActive = IsActive
-        };
-    }
 }
