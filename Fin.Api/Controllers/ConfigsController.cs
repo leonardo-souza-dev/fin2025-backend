@@ -1,6 +1,4 @@
-using Fin.Application.UseCases;
 using Fin.Application.UseCases.Configs;
-using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

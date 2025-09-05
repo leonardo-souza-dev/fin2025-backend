@@ -10,9 +10,11 @@ public class AuthController(
     RefreshTokenUseCase refreshTokenUseCase,
     RegisterUseCase registerUseCase) : ControllerBase
 {
-    private const string REFRESH_TOKEN_KEY = "refreshToken";
+    private const string REFRESH_TOKEN_KEY = "refreshToken"; //TODO: refactor
 
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Login([FromBody] LoginRequest request)
     {
         var cookies = Response.Cookies;
@@ -36,6 +38,7 @@ public class AuthController(
     }
 
     [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public IActionResult Register([FromBody] RegisterRequest request)
     {
         var cookies = Response.Cookies;
@@ -45,6 +48,7 @@ public class AuthController(
     }
 
     [HttpDelete("logout")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Logout()
     {
         Response.Cookies.Delete(REFRESH_TOKEN_KEY);

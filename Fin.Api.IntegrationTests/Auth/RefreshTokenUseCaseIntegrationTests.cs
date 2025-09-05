@@ -2,7 +2,7 @@ using System.Net;
 using System.Text;
 using Fin.Api.IntegrationTests.Base;
 
-namespace Fin.Api.IntegrationTests.Authorizations;
+namespace Fin.Api.IntegrationTests.Auth;
 
 public class RefreshTokenUseCaseIntegrationTests : IntegrationTestBase
 {

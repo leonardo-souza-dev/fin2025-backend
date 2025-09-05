@@ -21,6 +21,12 @@ namespace Fin.Application.UseCases.BankAccounts
 
     public class GetAllBankAccountsResponse : Dictionary<string, List<Account>>
     {
+        // only for deserialization
+        public GetAllBankAccountsResponse()
+        {
+            
+        }
+        
         public GetAllBankAccountsResponse(IEnumerable<Account> accounts, IEnumerable<Bank> banks)
         {
             var bankDictionary = banks.ToDictionary(b => b.Id, b => b.Name);
@@ -31,7 +37,7 @@ namespace Fin.Application.UseCases.BankAccounts
                 
                 if (!this.ContainsKey(bankName))
                 {
-                    this[bankName] = new List<Account>();
+                    this[bankName] = [];
                 }
 
                 this[bankName].Add(account);

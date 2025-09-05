@@ -13,6 +13,8 @@ public class PaymentsController(
 {
     [HttpPost]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Create([FromBody] CreatePaymentRequest request)
     {
         return CreatedAtAction(nameof(Create), createPaymentUseCase.Handle(request));
@@ -20,6 +22,8 @@ public class PaymentsController(
 
     [HttpPut("{id:int:min(1)}")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Update([FromRoute] int id, [FromBody] EditPaymentRequest request)
     {
         request.Id = id;
@@ -29,6 +33,8 @@ public class PaymentsController(
 
     [HttpDelete("{id:int:min(1)}")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Delete([FromRoute] int id)
     {
         deletePaymentOrRelatedTransferIfAnyUseCase.Handle(id);
