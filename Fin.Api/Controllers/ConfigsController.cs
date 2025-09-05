@@ -1,5 +1,6 @@
-using Fin.Api.Models;
-using Fin.Api.Services;
+using Fin.Application.UseCases;
+using Fin.Application.UseCases.Configs;
+using Fin.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,55 +8,39 @@ namespace Fin.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ConfigsController(ConfigService service) : ControllerBase
+public class ConfigsController(
+    GetAllConfigsUseCase getAllConfigsUseCase,
+    CreateConfigUseCase createConfigUseCase,
+    UpdateConfigUseCase updateConfigUseCase) : ControllerBase
 {
     [HttpGet]
     [Authorize]
-    public IActionResult GetAll() => Ok(service.GetAll());
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult GetAll()
+    {
+        var response = getAllConfigsUseCase.Handle();
+        return Ok(response);
+    }
 
     [HttpPost]
     [Authorize]
-    public IActionResult Create([FromBody] Config config)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult Create([FromBody] CreateConfigRequest request)
     {
-        if (config == null || config.Id.HasValue)
-        {
-            return BadRequest("Config cannot be null or some ID was found.");
-        }
-
-        try
-        {
-            service.Create(config);
-        }
-        catch(InvalidOperationException ex)
-        {
-            return BadRequest(ex);
-        }
-
-        return CreatedAtAction(nameof(Create), config);
+        var response = createConfigUseCase.Handle(request);
+        return CreatedAtAction(nameof(Create), response);
     }
 
-    [HttpPut]
+    [HttpPut("{id:int:min(1)}")]
     [Authorize]
-    public IActionResult Update([FromBody] Config config)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult Update([FromRoute] int id, [FromBody] UpdateConfigRequest request)
     {
-        if (config == null || !config.Id.HasValue)
-        {
-            return BadRequest("Config cannot be null or ID not found.");
-        }
-
-        try
-        {
-            service.Update(config);
-        }
-        catch (ArgumentOutOfRangeException ex)
-        {
-            return NotFound();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest("Entity does not exists. " + ex);
-        }
-
-        return Ok(config);
+        request.Id = id;
+        updateConfigUseCase.Handle(request);
+        return Ok();
     }
 }

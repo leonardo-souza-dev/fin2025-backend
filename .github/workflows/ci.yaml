@@ -3,14 +3,56 @@ on:
   pull_request:
     branches:
       - develop
+  push:
+    branches:
+      - develop
 jobs:
   check-fin-application:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
       - name: Set dotnet 8.0
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0'
-      - run: dotnet test
+
+      - name: Install Coverlet
+        run: dotnet tool install --global coverlet.console
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Install SonarScanner for .NET
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Add .NET tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: SonarCloud Begin
+        run: |
+          dotnet sonarscanner begin \
+          /k:"leonardo-souza-dev_fin2025-backend" \
+          /o:"ltreze" \
+          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.host.url="https://sonarcloud.io" \
+          /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+          /d:sonar.cs.vstest.reportsPaths="**/TestResults.xml" \
+          /d:sonar.coverage.exclusions="**/Program.cs,**/Migrations/**" \
+          /d:sonar.exclusions="**/bin/**,**/obj/**,**/Migrations/**"
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test with Coverage
+        run: |
+          dotnet test --no-build --configuration Release \
+          --logger "trx;LogFileName=TestResults.xml" \
+          --collect:"XPlat Code Coverage" \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: SonarCloud End
+        run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

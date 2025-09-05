@@ -1,34 +1,90 @@
-using Fin.Api.Data;
-using Fin.Api.Models;
-using Fin.Api.Repository;
-using Fin.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
+using Fin.Api.Infrastructure;
+using Fin.Application.Services;
+using Fin.Application.UseCases;
+using Fin.Application.UseCases.BankAccounts;
+using Fin.Application.UseCases.Auth;
+using Fin.Application.UseCases.Banks;
+using Fin.Application.UseCases.Configs;
+using Fin.Application.UseCases.Months;
+using Fin.Application.UseCases.Payments;
+using Fin.Application.UseCases.Transfers;
+using Fin.Infrastructure.Data;
+using Fin.Infrastructure.Repositories;
 
 namespace Fin.Api;
 
 public class Program
 {
+    private const string FIN2025_JWT_SECRET_KEY = "FIN2025_JWT_SECRET_KEY";
+    private const string FIN2025_DATABASE_CONNECTION = "FIN2025_DATABASE_CONNECTION";
+
     private static void AddApplicationDependencies(WebApplicationBuilder builder)
     {
-        builder.Services.AddDbContext<FinDbContext>();
+        var connectionString = Environment.GetEnvironmentVariable(FIN2025_DATABASE_CONNECTION);
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException(
+                "String de conexão não configurada. Configure a variável de ambiente FIN2025_DATABASE_CONNECTION ou a configuração DefaultConnection.");
+        }
+
+        builder.Services.AddDbContext<FinDbContext>(options => options.UseNpgsql(connectionString), ServiceLifetime.Scoped);
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IBankRepository, BankRepository>();
         builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
-        builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+        builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+        builder.Services.AddScoped<IRecurrenceRepository, RecurrenceRepository>();
 
-        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // services
+        builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ConfigService>();
-        builder.Services.AddScoped<UserService>();
-        builder.Services.AddScoped<MonthService>();
 
-        builder.Services.AddScoped<TransactionService>();
+        // use cases
+        // bankAccounts
+        builder.Services.AddScoped<GetAllBankAccountsUseCase>();
+        builder.Services.AddScoped<GetAllAccountsUseCase>();
+        // auth
+        builder.Services.AddScoped<LoginUseCase>();
+        builder.Services.AddScoped<RefreshTokenUseCase>();
+        builder.Services.AddScoped<RegisterUseCase>();
+        // banks
+        builder.Services.AddScoped<GetBanksUseCase>();
+        // configs
+        builder.Services.AddScoped<CreateConfigUseCase>();
+        builder.Services.AddScoped<GetAllConfigsUseCase>();
+        builder.Services.AddScoped<UpdateConfigUseCase>();
+        // months
+        builder.Services.AddScoped<GetMonthUseCase>();
+        // payments
+        builder.Services.AddScoped<CreatePaymentUseCase>();
+        builder.Services.AddScoped<CreateTransferUseCase>();
+        builder.Services.AddScoped<DeletePaymentOrRelatedTransferIfAnyUseCase>();
+        builder.Services.AddScoped<DeleteTransferUseCase>();
+        builder.Services.AddScoped<RecurrenceService>();
+        builder.Services.AddScoped<EditPaymentUseCase>();
+        builder.Services.AddScoped<EditTransferUseCase>();
+        builder.Services.AddScoped<UserService>();
+        
+        builder.Services.Configure<RouteOptions>(options =>
+        {
+            options.LowercaseUrls = true;
+        });
+        builder.Services.AddControllers(options =>
+        {
+            options.Conventions.Add(new Microsoft.AspNetCore.Mvc.ApplicationModels.RouteTokenTransformerConvention(
+                new KebabCaseParameterTransformer()));
+        });
     }
 
     public static void Main(string[] args)
@@ -36,7 +92,16 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-        var secretKey = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]!);
+        
+        var secretKey = Environment.GetEnvironmentVariable(FIN2025_JWT_SECRET_KEY);
+
+        if (string.IsNullOrEmpty(secretKey))
+        {
+            throw new InvalidOperationException(
+                "JWT Secret Key não configurada. Configure a variável de ambiente FIN2025_JWT_SECRET_KEY ou use User Secrets.");
+        }
+
+        var secretKeyBytes = Encoding.ASCII.GetBytes(secretKey);
 
         builder.Services.AddAuthentication(options =>
         {
@@ -53,8 +118,8 @@ public class Program
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtSettings["Issuer"],
                 ValidAudience = jwtSettings["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-                ClockSkew = TimeSpan.Zero // Remove toler�ncia de tempo
+                IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+                ClockSkew = TimeSpan.Zero // Remove tolerância de tempo
             };
         });
         builder.Services.AddAuthorization();
@@ -81,15 +146,15 @@ public class Program
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                        new OpenApiSecurityScheme
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
                         {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
                 }
             });
         });
@@ -99,7 +164,13 @@ public class Program
                               policy =>
                               {
                                   policy
-                                    .WithOrigins("https://localhost:9008", "http://localhost:9008", "https://[::1]:9008")
+                                    .WithOrigins(
+                                      "http://127.0.0.1:3000", 
+                                      "https://127.0.0.1:3000",
+                                      "http://localhost:3000",
+                                      "https://localhost:3000",
+                                      "http://[::1]:3000",
+                                      "https://[::1]:3000")
                                     .AllowAnyHeader()
                                     .AllowAnyMethod()
                                     .AllowCredentials();
@@ -110,7 +181,6 @@ public class Program
             options.LowercaseUrls = true;
         });
 
-        // Add services to the container.
         AddApplicationDependencies(builder);
 
         var app = builder.Build();
@@ -118,11 +188,9 @@ public class Program
         app.UseCors(myAllowSpecificOrigins);// before useAuthentication, and useAuthorization
         app.UseAuthentication();
         app.UseAuthorization();
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+        app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+        app.UseSwagger();
+        app.UseSwaggerUI();
         app.UseHttpsRedirection();
         app.MapControllers();
         app.Run();
