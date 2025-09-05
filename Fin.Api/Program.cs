@@ -58,6 +58,7 @@ public class Program
         builder.Services.AddScoped<LoginUseCase>();
         builder.Services.AddScoped<RefreshTokenUseCase>();
         builder.Services.AddScoped<RegisterUseCase>();
+        builder.Services.AddScoped<LogoutUseCase>();
         // banks
         builder.Services.AddScoped<GetBanksUseCase>();
         // configs

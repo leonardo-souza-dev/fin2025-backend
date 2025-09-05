@@ -12,7 +12,7 @@ public class BankAccountsController(
 {
     [HttpGet]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<GetAllBankAccountsResponse>(StatusCodes.Status200OK)]
     public IActionResult GetAll()
     {
         var response = getAllBankAccountsUseCase.Handle();
@@ -21,7 +21,7 @@ public class BankAccountsController(
     
     [HttpGet("accounts")]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<GetAllAccountsResponse>(StatusCodes.Status200OK)]
     public IActionResult GetAllAccounts()
     {
         var response = getAllAccountsUseCase.Handle();

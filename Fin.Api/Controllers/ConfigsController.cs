@@ -13,7 +13,7 @@ public class ConfigsController(
 {
     [HttpGet]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<GetAllConfigsResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult GetAll()
     {
@@ -23,7 +23,7 @@ public class ConfigsController(
 
     [HttpPost]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType<CreateConfigResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Create([FromBody] CreateConfigRequest request)
     {

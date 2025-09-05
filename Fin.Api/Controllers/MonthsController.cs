@@ -10,7 +10,7 @@ public class MonthsController(GetMonthUseCase useCase) : ControllerBase
 {
     [HttpGet("year/{year}/month/{month}/accounts/{accountIds}")]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<GetMonthResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Get(int year, int month, string accountIds)
     {

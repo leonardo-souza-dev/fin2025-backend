@@ -13,7 +13,7 @@ public class PaymentsController(
 {
     [HttpPost]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType<CreatePaymentResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Create([FromBody] CreatePaymentRequest request)
     {

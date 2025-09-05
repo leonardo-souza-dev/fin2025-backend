@@ -8,12 +8,11 @@ namespace Fin.Api.Controllers;
 public class AuthController(
     LoginUseCase loginUseCase,
     RefreshTokenUseCase refreshTokenUseCase,
-    RegisterUseCase registerUseCase) : ControllerBase
+    RegisterUseCase registerUseCase,
+    LogoutUseCase logoutUseCase) : ControllerBase
 {
-    private const string REFRESH_TOKEN_KEY = "refreshToken"; //TODO: refactor
-
     [HttpPost("login")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Login([FromBody] LoginRequest request)
     {
@@ -28,6 +27,7 @@ public class AuthController(
     }
 
     [HttpPost("refresh")]
+    [ProducesResponseType<RefreshTokenResponse>(StatusCodes.Status200OK)]
     public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var requestCookies = Request.Cookies;
@@ -38,7 +38,7 @@ public class AuthController(
     }
 
     [HttpPost("register")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType<RegisterResponse>(StatusCodes.Status201Created)]
     public IActionResult Register([FromBody] RegisterRequest request)
     {
         var cookies = Response.Cookies;
@@ -48,10 +48,11 @@ public class AuthController(
     }
 
     [HttpDelete("logout")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<LogoutResponse>(StatusCodes.Status200OK)]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete(REFRESH_TOKEN_KEY);
-        return Ok(new { Message = "Logout success" });
+        var responseCookies = Response.Cookies;
+        var response = logoutUseCase.Handle(ref responseCookies);
+        return Ok(response);
     }
 }
