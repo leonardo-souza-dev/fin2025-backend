@@ -8,7 +8,7 @@ public static class StringExtensions
     {
         if (string.IsNullOrEmpty(value))
             return value;
-
-        return Regex.Replace(value, "([a-z])([A-Z])", "$1-$2").ToLower();
+        
+        return Regex.Replace(value, "([a-z])([A-Z])", "$1-$2", RegexOptions.None, TimeSpan.FromMilliseconds(100)).ToLower();
     }
 }

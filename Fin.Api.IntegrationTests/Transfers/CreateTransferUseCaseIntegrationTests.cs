@@ -33,9 +33,9 @@ public class CreateTransferUseCaseIntegrationTests : IntegrationTestBase
         {
             Date = new DateOnly(2050, 6, 6),
             Description = "new descriptions transfer",
-            FromAccountId = _fromAccount.Id.Value,
+            FromAccountId = _fromAccount.Id!.Value,
             Amount = 10000,
-            ToAccountId = _toAccount.Id.Value,
+            ToAccountId = _toAccount.Id!.Value,
             IsRecurrence = false
         });
         
