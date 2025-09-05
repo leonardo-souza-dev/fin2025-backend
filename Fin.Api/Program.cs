@@ -48,7 +48,6 @@ public class Program
 
         // services
         builder.Services.AddScoped<IAuthService, AuthService>();
-        builder.Services.AddScoped<ConfigService>();
 
         // use cases
         // bankAccounts
@@ -75,7 +74,6 @@ public class Program
         builder.Services.AddScoped<RecurrenceService>();
         builder.Services.AddScoped<EditPaymentUseCase>();
         builder.Services.AddScoped<EditTransferUseCase>();
-        builder.Services.AddScoped<UserService>();
         
         builder.Services.Configure<RouteOptions>(options =>
         {

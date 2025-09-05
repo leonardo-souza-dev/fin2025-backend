@@ -1,6 +1,5 @@
 using Fin.Domain.Entities;
 using Fin.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Fin.Infrastructure.Repositories
 {

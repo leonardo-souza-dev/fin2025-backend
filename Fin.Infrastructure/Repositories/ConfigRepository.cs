@@ -9,7 +9,6 @@ namespace Fin.Infrastructure.Repositories
         IQueryable<Config> GetAll(Expression<Func<Config, bool>>? predicate = null);
         Config? Get(int id);
         void Create(Config config);
-        void Update(Config config);
     }
 
     public class ConfigRepository(FinDbContext context) : IConfigRepository
@@ -32,20 +31,6 @@ namespace Fin.Infrastructure.Repositories
         {
             config.IsActive = true;
             context.Configs.Add(config);
-        }
-
-        public void Update(Config config)
-        {
-            var existingConfig = context.Configs.Find(config.Id);
-
-            if (existingConfig == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            existingConfig.Key = config.Key;
-            existingConfig.Value = config.Value;
-            existingConfig.IsActive = true;
         }
     }
 }
